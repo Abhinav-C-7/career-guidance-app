@@ -1,0 +1,307 @@
+{
+  "careerId": "nda-officer-entry",
+  "title": "Armed forces officer (NDA entry)",
+  "family": "DEFENCE",
+  "notes": [
+    "NOTHING here is VERIFIED. Every criterion was extracted from a primary PDF by an automated pass and no person has checked it, so none of it renders to a student. Criteria at NEEDS_REVIEW need a named human to check the value against the cited source and set verifiedBy to their own name. Criteria at DRAFT are blocked by a modelling gap as well, and must not be moved past DRAFT until the gap named in the notes below is closed.",
+    "Source of record: UPSC Examination Notice No. 10/2026-NDA-II, dated 20.05.2026, for the 158th NDA Course and 120th Indian Naval Academy Course commencing 1 July 2027.",
+    "The notification states NO limit on the number of attempts. The absence of an attempt_limit criterion below is deliberate and verified, not an omission. Several coaching sites assert an attempt limit; the primary source does not.",
+    "Appendix-III of this notification contains no height, weight, chest or vision figures. It delegates all of them to the 'Joint Order Manual of Medical Standards for Entry into Armed Forces (1st Edition)'. Numbers circulating on coaching sites appear to derive from older notification formats and must not be copied in. See criterion nda-physical-standards.",
+    "MODEL GAP: the PCM subject requirement applies to the Air Force and Naval wings and the Naval Academy course, but not to the Army wing. Applicability cannot express 'which wing you applied for' yet. Until it can, nda-pcm-air-force-naval must not be published.",
+    "Marriage is barred not only at application but throughout training. Note 5 of the notification requires an undertaking not to marry until training completes; marrying during training means discharge and liability to refund the cost of training.",
+    "PHYSICAL STANDARDS, PARTIAL: the figures below come from 'Manual on Medical Examination and Medical Standards for Various Entries into the Army, Trg Academies and Mil Schools', an appendix to O/o DGMS(Army) letter 76054/Policy/DGMS-5A dated 16 Jul 2019. Section (m) of it is explicitly headed 'NDA, 10+2 TES & equivalent undergraduate 10+2 entries', so the scope is right. The DATE is the problem: UPSC's 2026 notification cites a Joint Order Manual (1st Edition) that post-dates this. Treat every figure here as a candidate to check against that newer document, not as current fact.",
+    "MODEL GAP, BLOCKS PUBLICATION of the two height criteria: the 2019 manual grants a lower minimum to Gorkhas and to candidates from the hills of the North East, Garhwal and Kumaon (152 cm male, 148 cm female against 157/152). Applicability can scope by sex, state and board but has no community dimension. A relaxation we fail to model makes us tell a student they are too short when they are not, which is the worst direction to be wrong in. Both height criteria stay DRAFT until this is fixed.",
+    "MODEL GAP: the Flying Branch minimum height is 163 cm and its visual standard is stricter (CP I). Neither is recorded, because Applicability still cannot express which branch or wing a candidate is applying for. Same gap that blocks nda-pcm-air-force-naval.",
+    "The growth allowance in EvaluationPolicy (2 cm below 18 years) is taken from para 51 of this same manual, not invented."
+  ],
+  "criteria": [
+    {
+      "id": "nda-nationality",
+      "label": "Nationality",
+      "review": "NEEDS_REVIEW",
+      "window": "ANNUAL",
+      "requirement": {
+        "value": {
+          "type": "nationality",
+          "accepted": [
+            "IN",
+            "NP",
+            "INDIAN_ORIGIN_MIGRANT"
+          ]
+        },
+        "provenance": {
+          "sourceUrl": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2026-05-20",
+          "lastVerifiedAt": "2026-09-17",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      }
+    },
+    {
+      "id": "nda-marital-status",
+      "label": "Must be unmarried",
+      "review": "NEEDS_REVIEW",
+      "window": "ANNUAL",
+      "requirement": {
+        "value": {
+          "type": "marital_status",
+          "mustBe": "UNMARRIED"
+        },
+        "provenance": {
+          "sourceUrl": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2026-05-20",
+          "lastVerifiedAt": "2026-09-17",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      }
+    },
+    {
+      "id": "nda-dob-window-ii-2026",
+      "label": "Date of birth window for NDA-II 2026",
+      "review": "NEEDS_REVIEW",
+      "window": "VOLATILE",
+      "requirement": {
+        "value": {
+          "type": "born_between",
+          "earliest": "2008-01-01",
+          "latest": "2011-01-01"
+        },
+        "provenance": {
+          "sourceUrl": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2026-05-20",
+          "effectiveTo": "2026-09-13",
+          "lastVerifiedAt": "2026-09-17",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      }
+    },
+    {
+      "id": "nda-class-12",
+      "label": "Class 12 pass, or currently appearing",
+      "review": "NEEDS_REVIEW",
+      "window": "ANNUAL",
+      "requirement": {
+        "value": {
+          "type": "completed_stage",
+          "stage": "CLASS_12",
+          "appearingAccepted": true
+        },
+        "provenance": {
+          "sourceUrl": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2026-05-20",
+          "lastVerifiedAt": "2026-09-17",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      }
+    },
+    {
+      "id": "nda-pcm-air-force-naval",
+      "label": "Physics, chemistry and mathematics at class 12",
+      "review": "DRAFT",
+      "window": "ANNUAL",
+      "requirement": {
+        "value": {
+          "type": "subjects_taken",
+          "subjects": [
+            "PHYSICS",
+            "CHEMISTRY",
+            "MATHEMATICS"
+          ],
+          "atStage": "CLASS_12"
+        },
+        "provenance": {
+          "sourceUrl": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2026-05-20",
+          "lastVerifiedAt": "2026-09-17",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      }
+    },
+    {
+      "id": "nda-tattoo-placement",
+      "label": "Permanent tattoo placement",
+      "review": "NEEDS_REVIEW",
+      "window": "SLOW",
+      "requirement": {
+        "value": {
+          "type": "medical_disqualifier",
+          "conditionCode": "TATTOO_OUTSIDE_PERMITTED_AREA"
+        },
+        "provenance": {
+          "sourceUrl": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2026-05-20",
+          "lastVerifiedAt": "2026-09-17",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      }
+    },
+    {
+      "id": "nda-not-debarred-by-mod",
+      "label": "Not debarred by the Ministry of Defence",
+      "review": "NEEDS_REVIEW",
+      "window": "ANNUAL",
+      "requirement": {
+        "value": {
+          "type": "no_prior_disqualification",
+          "code": "DEBARRED_BY_MOD"
+        },
+        "provenance": {
+          "sourceUrl": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2026-05-20",
+          "lastVerifiedAt": "2026-09-17",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      }
+    },
+    {
+      "id": "nda-no-academy-withdrawal",
+      "label": "Has not resigned or been withdrawn from an armed forces academy on disciplinary grounds",
+      "review": "NEEDS_REVIEW",
+      "window": "ANNUAL",
+      "requirement": {
+        "value": {
+          "type": "no_prior_disqualification",
+          "code": "WITHDRAWN_FROM_ARMED_FORCES_ACADEMY"
+        },
+        "provenance": {
+          "sourceUrl": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2026-05-20",
+          "lastVerifiedAt": "2026-09-17",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      }
+    },
+    {
+      "id": "nda-height-male-cadet",
+      "label": "Minimum height, male cadets",
+      "review": "DRAFT",
+      "window": "SLOW",
+      "requirement": {
+        "value": {
+          "type": "body_metric",
+          "metric": "HEIGHT_CM",
+          "atLeast": 157.0
+        },
+        "provenance": {
+          "sourceUrl": "https://joinindianarmy.nic.in/writereaddata/Portal/Images/pdf/MEDICAL_POLICY_FOR_OFFICER_ENTRY.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2019-07-16",
+          "lastVerifiedAt": "2026-09-17",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      },
+      "appliesTo": {
+        "sex": [
+          "MALE"
+        ]
+      }
+    },
+    {
+      "id": "nda-height-female-cadet",
+      "label": "Minimum height, female cadets",
+      "review": "DRAFT",
+      "window": "SLOW",
+      "requirement": {
+        "value": {
+          "type": "body_metric",
+          "metric": "HEIGHT_CM",
+          "atLeast": 152.0
+        },
+        "provenance": {
+          "sourceUrl": "https://joinindianarmy.nic.in/writereaddata/Portal/Images/pdf/MEDICAL_POLICY_FOR_OFFICER_ENTRY.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2019-07-16",
+          "lastVerifiedAt": "2026-09-17",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      },
+      "appliesTo": {
+        "sex": [
+          "FEMALE"
+        ]
+      }
+    },
+    {
+      "id": "nda-chest-minimum",
+      "label": "Minimum chest circumference",
+      "review": "NEEDS_REVIEW",
+      "window": "SLOW",
+      "requirement": {
+        "value": {
+          "type": "body_metric",
+          "metric": "CHEST_EXPANDED_CM",
+          "atLeast": 77.0
+        },
+        "provenance": {
+          "sourceUrl": "https://joinindianarmy.nic.in/writereaddata/Portal/Images/pdf/MEDICAL_POLICY_FOR_OFFICER_ENTRY.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2019-07-16",
+          "lastVerifiedAt": "2026-09-17",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      }
+    },
+    {
+      "id": "nda-visual-standard-army",
+      "label": "Visual standard, NDA Army and 10+2 equivalent entries",
+      "review": "NEEDS_REVIEW",
+      "window": "SLOW",
+      "requirement": {
+        "value": {
+          "type": "visual_standard",
+          "uncorrectedBetterEye": 36,
+          "uncorrectedWorseEye": 36,
+          "bestCorrectedEachEye": 6,
+          "maxMyopiaDSph": -2.5,
+          "maxHypermetropiaDSph": 2.5,
+          "refractiveSurgeryPermitted": false
+        },
+        "provenance": {
+          "sourceUrl": "https://joinindianarmy.nic.in/writereaddata/Portal/Images/pdf/MEDICAL_POLICY_FOR_OFFICER_ENTRY.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2019-07-16",
+          "lastVerifiedAt": "2026-09-17",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      }
+    },
+    {
+      "id": "nda-colour-vision-army",
+      "label": "Colour vision, NDA Army and 10+2 equivalent entries",
+      "review": "NEEDS_REVIEW",
+      "window": "SLOW",
+      "requirement": {
+        "value": {
+          "type": "colour_vision",
+          "atLeast": "CP2"
+        },
+        "provenance": {
+          "sourceUrl": "https://joinindianarmy.nic.in/writereaddata/Portal/Images/pdf/MEDICAL_POLICY_FOR_OFFICER_ENTRY.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2019-07-16",
+          "lastVerifiedAt": "2026-09-17",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      }
+    },
+    {
+      "id": "nda-physical-standards",
+      "label": "Remaining physical and medical standards, current edition",
+      "review": "KNOWN_UNSOURCED",
+      "window": "SLOW",
+      "lookUpAt": {
+        "describedAs": "Joint Order Manual of Medical Standards for Entry into Armed Forces (1st Edition) — the edition UPSC actually cites. Not obtained: joinindianarmy.nic.in is behind a CAPTCHA and the manual is not indexed at a direct PDF URL. Weight-for-height (BMI) tables and the full disqualifying-condition list are still missing.",
+        "url": "https://joinindianarmy.nic.in",
+        "citedBy": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf"
+      }
+    }
+  ]
+}

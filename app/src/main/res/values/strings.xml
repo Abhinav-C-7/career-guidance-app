@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Foreway</string>
+
+    <!--
+      Every sentence a student reads about an eligibility outcome lives here, and nowhere
+      else. The rules engine reports structured facts; this file decides the wording.
+
+      That split is what makes a Hindi or Tamil build possible — add values-hi and nothing
+      in the engine changes. It does NOT remove the need for a release to change wording,
+      because this file ships in the APK. Serving copy from the content store would.
+    -->
+
+    <!-- What we still need from the student -->
+    <string name="need_date_of_birth">Your date of birth</string>
+    <string name="need_current_class">Which class you are in</string>
+    <string name="need_subjects">The subjects you are taking</string>
+    <string name="need_body_measurement">A recent measurement</string>
+    <string name="need_eye_test">A recent eye test</string>
+    <string name="need_full_eye_test">A full eye test, including your prescription</string>
+    <string name="need_colour_vision_test">A colour vision test result</string>
+    <string name="need_marks">Your result for this stage</string>
+    <string name="need_attempts">How many attempts you have used</string>
+    <string name="need_marital_status">Your marital status</string>
+    <string name="need_nationality">Your nationality</string>
+    <string name="need_health_declarations">A few health questions</string>
+    <string name="need_prior_applications">A few questions about past applications</string>
+    <string name="need_profile_scope">A little more about you, before we can say whether this applies</string>
+
+    <!-- Our own gap, not the student\'s -->
+    <string name="need_verified_figure">We do not have a verified figure for this yet</string>
+
+    <!-- Recoverable shortfalls -->
+    <string name="risk_metric_short">Currently %1$s %2$s below the standard. This can still change — worth tracking.</string>
+    <string name="risk_metric_over">Currently %1$s %2$s above the standard. This can still change — worth tracking.</string>
+    <string name="risk_too_young">You are younger than this cycle allows. A later cycle will be the one for you.</string>
+    <string name="risk_subjects_ahead">You will need %1$s. That choice is still ahead of you.</string>
+    <string name="risk_stage_ahead">This is still ahead of you.</string>
+    <string name="risk_stage_not_passed">You need to have passed before you can apply.</string>
+    <string name="risk_marks_target">You are aiming for %1$s%%.</string>
+    <string name="risk_vision">Your last recorded eyesight is outside this standard. Eyesight changes, so re-test before relying on this.</string>
+
+    <!-- Closed doors. Plain and factual; never apologetic, never alarming. -->
+    <string name="block_born_before">This cycle is for candidates born on or after %1$s.</string>
+    <string name="block_metric_final">The standard is not met, and this measurement is unlikely to change further.</string>
+    <string name="block_colour_vision">This route requires %1$s colour vision.</string>
+    <string name="block_refractive_surgery">This route does not accept candidates who have had laser eye surgery.</string>
+    <string name="block_subjects_locked">This route needs %1$s, and that choice is already behind you.</string>
+    <string name="block_marks_sat">This route needs %1$s%%, and that exam is behind you.</string>
+    <string name="block_attempts">All %1$d attempts are used.</string>
+    <string name="block_unmarried">This route requires candidates to be unmarried.</string>
+    <string name="block_nationality">This route is open to %1$s nationals.</string>
+    <string name="block_medical">This is a listed disqualifying condition for this route.</string>
+    <string name="block_prior_disqualification">This is an absolute bar on applying for this route.</string>
+
+    <!-- Units -->
+    <string name="unit_cm">cm</string>
+    <string name="unit_kg">kg</string>
+
+    <!-- Row furniture -->
+    <string name="still_open_link">See what this still leaves open</string>
+    <string name="chip_needs_recheck">%1$s · needs re-check</string>
+    <string name="chip_verified">%1$s · verified %2$s</string>
+    <string name="chip_no_figure">No verified figure yet</string>
+    <string name="chip_no_figure_with_pointer">No verified figure yet · see %1$s</string>
+</resources>
