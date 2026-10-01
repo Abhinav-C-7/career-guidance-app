@@ -2,6 +2,7 @@ package app.foreway.data.local
 
 import androidx.room.withTransaction
 import app.foreway.data.remote.CriterionRow
+import app.foreway.data.remote.MilestoneRow
 import app.foreway.data.sync.ContentStore
 import app.foreway.data.sync.Cursor
 import app.foreway.data.sync.Stream
@@ -19,6 +20,7 @@ internal class RoomContentStore(private val db: ForewayDatabase) : ContentStore 
         db.withTransaction {
             if (update.replaceAll) {
                 dao.clearCriteria()
+                dao.clearMilestones()
                 dao.clearCareers()
             }
             dao.upsertCareers(
@@ -34,8 +36,20 @@ internal class RoomContentStore(private val db: ForewayDatabase) : ContentStore 
                     )
                 },
             )
+            dao.upsertMilestones(
+                update.milestones.map {
+                    MilestoneEntity(
+                        id = it.id,
+                        careerId = it.careerId,
+                        position = it.position,
+                        row = Json.encodeToString(MilestoneRow.serializer(), it),
+                        updatedAt = it.updatedAt,
+                    )
+                },
+            )
             // Older Android builds cap a statement at 999 bound variables.
             update.withdrawnIds.chunked(500).forEach { dao.deleteCriteria(it) }
+            update.withdrawnMilestoneIds.chunked(500).forEach { dao.deleteMilestones(it) }
 
             update.cursors.forEach { (stream, c) ->
                 dao.saveCursor(SyncCursorEntity(stream.name, c.at, c.id))

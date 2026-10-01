@@ -59,8 +59,9 @@ private fun run(dir: File, apply: Boolean, allowDelete: Boolean) {
     val careerIds = content.values.map { it.careerId }
     val existingCareers = api.select("careers", Rows.careerColumns, "id", careerIds)
     val existingCriteria = api.select("criteria", Rows.criterionColumns, "career_id", careerIds)
+    val existingMilestones = api.select("milestones", Rows.milestoneColumns, "career_id", careerIds)
 
-    val plan = plan(content.values, existingCareers, existingCriteria)
+    val plan = plan(content.values, existingCareers, existingCriteria, existingMilestones)
     report(plan)
 
     if (plan.isEmpty) return
@@ -68,17 +69,24 @@ private fun run(dir: File, apply: Boolean, allowDelete: Boolean) {
         println("\nDry run. Nothing written. Re-run with --apply to publish.")
         return
     }
-    if (plan.deletions.isNotEmpty() && !allowDelete) {
+    val deletes = plan.criteria.deletions.isNotEmpty() || plan.milestones.deletions.isNotEmpty()
+    if (deletes && !allowDelete) {
         throw PublishFailed(
-            "\nThe plan deletes criteria. Nothing written. Re-run with --apply --allow-delete " +
+            "\nThe plan deletes rows. Nothing written. Re-run with --apply --allow-delete " +
                 "if that is intended; the audit history keeps the old rows either way.",
         )
     }
 
-    // Careers first: criteria reference them.
+    // Careers first: criteria and milestones reference them.
     if (plan.careerUpserts.isNotEmpty()) api.upsert("careers", plan.careerUpserts)
-    if (plan.criterionUpserts.isNotEmpty()) api.upsert("criteria", plan.criterionUpserts)
-    if (plan.deletions.isNotEmpty()) api.delete("criteria", plan.deletions)
+
+    if (plan.criteria.upserts.isNotEmpty()) api.upsert("criteria", plan.criteria.upserts)
+    if (plan.criteria.deletions.isNotEmpty()) api.delete("criteria", plan.criteria.deletions)
+
+    // Milestones delete first: a new step taking a removed step's position would otherwise
+    // collide on (career_id, position) when the upsert commits.
+    if (plan.milestones.deletions.isNotEmpty()) api.delete("milestones", plan.milestones.deletions)
+    if (plan.milestones.upserts.isNotEmpty()) api.upsert("milestones", plan.milestones.upserts)
 
     println("\nPublished.")
 }
@@ -88,16 +96,22 @@ private fun report(plan: Plan) {
         println("Up to date. Nothing to publish.")
         return
     }
-    println("Careers to write:    ${plan.careerUpserts.size}")
-    println("Criteria to write:   ${plan.criterionUpserts.size}")
-    println("Criteria to delete:  ${plan.deletions.size}")
-    plan.deletions.forEach { println("  - $it") }
+    println("Careers to write: ${plan.careerUpserts.size}")
+    report("Criteria", plan.criteria)
+    report("Milestones", plan.milestones)
+}
+
+private fun report(name: String, t: TableChanges) {
+    println()
+    println("$name to write:  ${t.upserts.size}")
+    println("$name to delete: ${t.deletions.size}")
+    t.deletions.forEach { println("  - $it") }
 
     // The only lines that change what a student sees. Read these every time.
-    println("\nStudents WILL START seeing (${plan.becomingVisible.size}):")
-    plan.becomingVisible.forEach { println("  + $it") }
-    println("Students will STOP seeing (${plan.leavingVisible.size}):")
-    plan.leavingVisible.forEach { println("  - $it") }
+    println("Students WILL START seeing (${t.becomingVisible.size}):")
+    t.becomingVisible.forEach { println("  + $it") }
+    println("Students will STOP seeing (${t.leavingVisible.size}):")
+    t.leavingVisible.forEach { println("  - $it") }
 }
 
 internal class PublishFailed(message: String) : Exception(message)

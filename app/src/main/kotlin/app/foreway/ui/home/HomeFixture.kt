@@ -31,7 +31,7 @@ import kotlinx.datetime.LocalDate
  */
 object HomeFixture {
 
-    private val today = LocalDate(2026, 9, 20)
+    val today = LocalDate(2026, 9, 20)
 
     private fun provenance(verified: LocalDate = LocalDate(2026, 5, 20)) = Provenance(
         sourceUrl = "https://www.upsc.gov.in/",
@@ -64,7 +64,7 @@ object HomeFixture {
         declaredConditions = setOf("TATTOO_OUTSIDE_PERMITTED_AREA"),
     )
 
-    private val criteria = listOf(
+    val criteria = listOf(
         verified(
             id = "nationality",
             label = "Nationality",

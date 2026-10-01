@@ -171,4 +171,26 @@
     <string name="state_up">Uttar Pradesh</string>
     <string name="state_uk">Uttarakhand</string>
     <string name="state_wb">West Bengal</string>
+
+    <string name="source_fallback">Source</string>
+
+    <!-- Pathway -->
+    <string name="home_view_pathway">View full pathway</string>
+    <string name="pathway_back">Back</string>
+    <string name="pathway_intro">Each step, when it comes for you, and what is checked there.</string>
+    <string name="pathway_you_are_here">You are here · %1$s</string>
+    <string name="pathway_now">Now · %1$s</string>
+    <string name="timing_school_years">Class %1$d to %2$d</string>
+    <string name="timing_one_year">Class %1$d</string>
+    <string name="timing_from_stage">From class %1$d</string>
+    <string name="timing_after_school">After class 12</string>
+    <string name="timing_follows">Then</string>
+    <string name="pathway_checked_here">Checked at this step</string>
+    <string name="pathway_other_gates">Also checked</string>
+    <string name="pathway_no_steps">We have not verified the steps for this career yet. We would rather show nothing than guess.</string>
+    <string name="pathway_so_far">What we can tell you so far</string>
+    <plurals name="pathway_unreadable">
+        <item quantity="one">One step needs a newer version of the app. Update to see it.</item>
+        <item quantity="other">%1$d steps need a newer version of the app. Update to see them.</item>
+    </plurals>
 </resources>

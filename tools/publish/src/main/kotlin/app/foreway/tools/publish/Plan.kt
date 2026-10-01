@@ -6,33 +6,43 @@ import app.foreway.domain.model.ReviewState
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
+/** The changes to one table. */
+internal data class TableChanges(
+    val upserts: List<JsonObject>,
+    val deletions: List<String>,
+    /** Rows a student will start seeing after this publish. The lines to read carefully. */
+    val becomingVisible: List<String>,
+    val leavingVisible: List<String>,
+) {
+    val isEmpty: Boolean get() = upserts.isEmpty() && deletions.isEmpty()
+}
+
 /**
  * What a publish would change, computed before anything is written.
  *
  * Every review state is written, not just the published ones. The database is where a
  * demotion has to land — a criterion that goes VERIFIED -> NEEDS_REVIEW in the repo must
  * go the same way on the server, or phones keep the retracted figure. Unreviewed rows are
- * harmless there: RLS and published_criteria never return them.
+ * harmless there: RLS and the published views never return them.
  *
  * Unchanged rows are not sent. Each write bumps updated_at, and every phone re-downloads
  * whatever has a newer updated_at, so a no-op republish would cost every student a sync.
  */
 internal data class Plan(
     val careerUpserts: List<JsonObject>,
-    val criterionUpserts: List<JsonObject>,
-    val deletions: List<String>,
-    /** Criteria a student will start seeing after this publish. The line to read carefully. */
-    val becomingVisible: List<String>,
-    val leavingVisible: List<String>,
+    val criteria: TableChanges,
+    val milestones: TableChanges,
 ) {
-    val isEmpty: Boolean
-        get() = careerUpserts.isEmpty() && criterionUpserts.isEmpty() && deletions.isEmpty()
+    val isEmpty: Boolean get() = careerUpserts.isEmpty() && criteria.isEmpty && milestones.isEmpty
 }
 
 internal class ContentRejected(message: String) : Exception(message)
 
 private val slug = Regex("^[a-z0-9][a-z0-9-]*$")
-private val publishedStates = setOf(ReviewState.VERIFIED.name, ReviewState.KNOWN_UNSOURCED.name)
+
+/** What each table lets a student see. Must match the RLS policies exactly. */
+private val criteriaPublished = setOf(ReviewState.VERIFIED.name, ReviewState.KNOWN_UNSOURCED.name)
+private val milestonesPublished = setOf(ReviewState.VERIFIED.name)
 
 /**
  * The publish tool's own gate, independent of the database's. Checks what the schema
@@ -49,14 +59,14 @@ internal fun validate(files: Map<String, CareerContent>) {
         }
         if (!slug.matches(content.careerId)) problems += "$fileName: careerId is not a slug"
 
-        for (c in content.criteria) {
-            if (!slug.matches(c.id)) problems += "${c.id}: id is not a slug"
-            seen.put(c.id, fileName)?.let { problems += "${c.id}: appears in both $it and $fileName" }
+        val signed = content.criteria.map { Triple(it.id, it.review, it.requirement?.provenance) } +
+            content.milestones.map { Triple(it.id, it.review, it.provenance) }
 
-            if (c.review == ReviewState.VERIFIED &&
-                c.requirement?.provenance?.verifiedBy == Provenance.UNREVIEWED
-            ) {
-                problems += "${c.id}: VERIFIED but signed '${Provenance.UNREVIEWED}' — a person must sign"
+        for ((id, review, provenance) in signed) {
+            if (!slug.matches(id)) problems += "$id: id is not a slug"
+            seen.put(id, fileName)?.let { problems += "$id: appears in both $it and $fileName" }
+            if (review == ReviewState.VERIFIED && provenance?.verifiedBy == Provenance.UNREVIEWED) {
+                problems += "$id: VERIFIED but signed '${Provenance.UNREVIEWED}' — a person must sign"
             }
         }
     }
@@ -65,33 +75,44 @@ internal fun validate(files: Map<String, CareerContent>) {
 }
 
 /**
- * [existingCareers] and [existingCriteria] are the current rows, as the service role sees
- * them, restricted to the careers being published. Careers absent from the repo are left
- * alone — publishing one file must never delete another career.
+ * The existing rows are the current server state, as the service role sees it, restricted
+ * to the careers being published. Careers absent from the repo are left alone — publishing
+ * one file must never delete another career.
  */
 internal fun plan(
     files: Collection<CareerContent>,
     existingCareers: List<JsonObject>,
     existingCriteria: List<JsonObject>,
+    existingMilestones: List<JsonObject> = emptyList(),
 ): Plan {
     val careersById = existingCareers.associateBy { it.id() }
-    val criteriaById = existingCriteria.associateBy { it.id() }
-
-    val careerUpserts = files.map(Rows::career).filter { careersById[it.id()] != it }
-
-    val desired = files.flatMap { f -> f.criteria.map { Rows.criterion(f.careerId, it) } }
-    val criterionUpserts = desired.filter { criteriaById[it.id()] != it }
-
-    val desiredIds = desired.map { it.id() }.toSet()
-    val deletions = existingCriteria.map { it.id() }.filter { it !in desiredIds }.sorted()
-
-    val wasVisible = existingCriteria.filter { it.isPublished() }.map { it.id() }.toSet()
-    val willBeVisible = desired.filter { it.isPublished() }.map { it.id() }.toSet()
-
     return Plan(
-        careerUpserts = careerUpserts,
-        criterionUpserts = criterionUpserts,
-        deletions = deletions,
+        careerUpserts = files.map(Rows::career).filter { careersById[it.id()] != it },
+        criteria = diff(
+            desired = files.flatMap { f -> f.criteria.map { Rows.criterion(f.careerId, it) } },
+            existing = existingCriteria,
+            published = criteriaPublished,
+        ),
+        milestones = diff(
+            desired = files.flatMap { f ->
+                f.milestones.mapIndexed { i, m -> Rows.milestone(f.careerId, i + 1, m) }
+            },
+            existing = existingMilestones,
+            published = milestonesPublished,
+        ),
+    )
+}
+
+private fun diff(desired: List<JsonObject>, existing: List<JsonObject>, published: Set<String>): TableChanges {
+    val existingById = existing.associateBy { it.id() }
+    val desiredIds = desired.map { it.id() }.toSet()
+
+    val wasVisible = existing.filter { it.review() in published }.map { it.id() }.toSet()
+    val willBeVisible = desired.filter { it.review() in published }.map { it.id() }.toSet()
+
+    return TableChanges(
+        upserts = desired.filter { existingById[it.id()] != it },
+        deletions = existing.map { it.id() }.filter { it !in desiredIds }.sorted(),
         becomingVisible = (willBeVisible - wasVisible).sorted(),
         leavingVisible = (wasVisible - willBeVisible).sorted(),
     )
@@ -99,5 +120,4 @@ internal fun plan(
 
 private fun JsonObject.id(): String = getValue("id").jsonPrimitive.content
 
-private fun JsonObject.isPublished(): Boolean =
-    get("review")?.jsonPrimitive?.content in publishedStates
+private fun JsonObject.review(): String? = get("review")?.jsonPrimitive?.content

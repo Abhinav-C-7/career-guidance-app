@@ -3,13 +3,17 @@ package app.foreway.data.remote
 import app.foreway.domain.model.Applicability
 import app.foreway.domain.model.Criterion
 import app.foreway.domain.model.LookupPointer
+import app.foreway.domain.model.Milestone
+import app.foreway.domain.model.MilestoneKind
 import app.foreway.domain.model.Provenance
 import app.foreway.domain.model.Requirement
 import app.foreway.domain.model.ReviewState
 import app.foreway.domain.model.SourceAuthority
 import app.foreway.domain.model.Sourced
+import app.foreway.domain.model.Timing
 import app.foreway.domain.model.VerificationWindow
 import kotlinx.datetime.LocalDate
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
@@ -91,6 +95,49 @@ internal object RowMapper {
         ),
         appliesTo = Applicability.Everyone,
         window = VerificationWindow.VOLATILE,
+    )
+
+    /**
+     * A step this build cannot read is returned as null, and counted by the caller.
+     * Unlike a criterion it cannot become a gap — a milestone is not itself a gate, and
+     * every gate it would have carried still arrives as a criterion with its own fallback.
+     */
+    fun milestone(row: MilestoneRow): Milestone? =
+        try {
+            val body = strict.decodeFromJsonElement(MilestoneBody.serializer(), row.body)
+            Milestone(
+                id = row.id,
+                title = body.title,
+                detail = body.detail,
+                kind = body.kind,
+                timing = body.timing,
+                gates = body.gates,
+                review = ReviewState.valueOf(row.review),
+                provenance = Provenance(
+                    sourceUrl = row.sourceUrl,
+                    authority = SourceAuthority.valueOf(row.sourceAuthority),
+                    effectiveFrom = LocalDate.parse(row.effectiveFrom),
+                    effectiveTo = row.effectiveTo?.let(LocalDate::parse),
+                    lastVerifiedAt = LocalDate.parse(row.lastVerifiedAt),
+                    verifiedBy = Provenance.WITHHELD,
+                ),
+                appliesTo = row.appliesTo.present()?.let {
+                    strict.decodeFromJsonElement(Applicability.serializer(), it)
+                } ?: Applicability.Everyone,
+                window = VerificationWindow.valueOf(row.verificationWindow),
+            )
+        } catch (_: Exception) {
+            null
+        }
+
+    /** The milestones.body column, as the publish tool writes it. */
+    @Serializable
+    private data class MilestoneBody(
+        val title: String,
+        val detail: String? = null,
+        val kind: MilestoneKind,
+        val timing: Timing,
+        val gates: List<String> = emptyList(),
     )
 
     private fun JsonElement?.present(): JsonElement? = takeUnless { it == null || it is JsonNull }

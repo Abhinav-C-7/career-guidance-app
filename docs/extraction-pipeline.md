@@ -136,8 +136,10 @@ on the server are invisible to clients. Unchanged rows are skipped, because ever
 
 ### What the app reads
 
-The client contract is `published_careers`, `published_criteria` and `criteria_withdrawals`
-(`supabase/migrations/20260925000001_published_views.sql`) — never the base tables. Sync is:
+The client contract is `published_careers`, `published_criteria`, `published_milestones`,
+`criteria_withdrawals` and `milestone_withdrawals` (`supabase/migrations/20260925000001_published_views.sql`
+and `20261002000001_milestones.sql`) — never the base tables. Milestones publish only when
+VERIFIED; unlike criteria they can never be a declared gap. Sync is:
 pull rows with `updated_at` after the last sync, then drop every id in `criteria_withdrawals`
 withdrawn after it. Without withdrawals, a demoted or deleted criterion would simply stop
 arriving, and a phone would go on showing it offline indefinitely.

@@ -40,13 +40,16 @@ class PlanTest {
     @Test
     fun `first publish of NDA exposes only the declared gap`() {
         val plan = plan(listOf(nda), emptyList(), emptyList())
-        assertEquals(nda.criteria.size, plan.criterionUpserts.size)
-        assertEquals(listOf("nda-physical-standards"), plan.becomingVisible)
+        assertEquals(nda.criteria.size, plan.criteria.upserts.size)
+        assertEquals(listOf("nda-physical-standards"), plan.criteria.becomingVisible)
     }
+
+    private fun stepsOf(content: CareerContent) =
+        content.milestones.mapIndexed { i, m -> Rows.milestone(content.careerId, i + 1, m) }
 
     @Test
     fun `republishing unchanged content writes nothing`() {
-        val plan = plan(listOf(nda), listOf(Rows.career(nda)), rowsOf(nda))
+        val plan = plan(listOf(nda), listOf(Rows.career(nda)), rowsOf(nda), stepsOf(nda))
         assertTrue(plan.isEmpty, "a no-op publish would force every phone to resync")
     }
 
@@ -60,15 +63,15 @@ class PlanTest {
             }
         }
         val plan = plan(listOf(nda), listOf(Rows.career(nda)), server)
-        assertEquals(listOf("nda-nationality"), plan.criterionUpserts.map { (it["id"] as JsonPrimitive).content })
-        assertEquals(listOf("nda-nationality"), plan.leavingVisible)
+        assertEquals(listOf("nda-nationality"), plan.criteria.upserts.map { (it["id"] as JsonPrimitive).content })
+        assertEquals(listOf("nda-nationality"), plan.criteria.leavingVisible)
     }
 
     @Test
     fun `a criterion removed from the repo is planned for deletion`() {
         val orphan = JsonObject(rowsOf(nda).first() + ("id" to JsonPrimitive("nda-retired-rule")))
         val plan = plan(listOf(nda), listOf(Rows.career(nda)), rowsOf(nda) + orphan)
-        assertEquals(listOf("nda-retired-rule"), plan.deletions)
+        assertEquals(listOf("nda-retired-rule"), plan.criteria.deletions)
     }
 
     @Test
@@ -84,5 +87,27 @@ class PlanTest {
     @Test
     fun `file name must match careerId`() {
         assertFailsWith<ContentRejected> { validate(mapOf("nda.json" to nda)) }
+    }
+
+    @Test
+    fun `milestones are written in file order and none is visible until reviewed`() {
+        val plan = plan(listOf(nda), emptyList(), emptyList())
+        val positions = plan.milestones.upserts.map { (it["position"] as JsonPrimitive).content.toInt() }
+        assertEquals((1..nda.milestones.size).toList(), positions)
+        assertTrue(plan.milestones.becomingVisible.isEmpty(), "NEEDS_REVIEW steps must not publish")
+    }
+
+    @Test
+    fun `milestone body carries the timing discriminator the app decodes on`() {
+        val body = stepsOf(nda).first()["body"] as JsonObject
+        assertEquals(JsonPrimitive("school_years"), (body["timing"] as JsonObject)["type"])
+    }
+
+    @Test
+    fun `a machine cannot sign a VERIFIED milestone either`() {
+        val selfSigned = nda.copy(
+            milestones = nda.milestones.mapIndexed { i, m -> if (i == 0) m.copy(review = ReviewState.VERIFIED) else m },
+        )
+        assertFailsWith<ContentRejected> { validate(mapOf("nda-officer-entry.json" to selfSigned)) }
     }
 }

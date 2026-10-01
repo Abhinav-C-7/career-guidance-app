@@ -1,13 +1,16 @@
 package app.foreway.data
 
 import app.foreway.data.remote.CriterionRow
+import app.foreway.data.remote.MilestoneRow
 import app.foreway.data.remote.RowMapper
 import app.foreway.domain.model.Applicability
 import app.foreway.domain.model.LookupPointer
 import app.foreway.domain.model.Provenance
 import app.foreway.domain.model.Requirement
 import app.foreway.domain.model.ReviewState
+import app.foreway.domain.model.SchoolClass
 import app.foreway.domain.model.Sex
+import app.foreway.domain.model.Timing
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -98,5 +101,31 @@ class RowMapperTest {
     fun `an unknown review state does not crash the mapper`() {
         val c = RowMapper.criterion(verified().copy(review = "PROVISIONAL"))
         assertEquals(LookupPointer.UNREADABLE_BY_THIS_VERSION, c.lookUpAt!!.describedAs)
+    }
+
+    private fun stepRow(body: String) = MilestoneRow(
+        id = "s", careerId = "c", position = 1, review = "VERIFIED", verificationWindow = "ANNUAL",
+        body = json(body), sourceUrl = "https://x.gov.in", sourceAuthority = "OFFICIAL_NOTIFICATION",
+        effectiveFrom = "2026-05-20", lastVerifiedAt = "2026-09-01", updatedAt = "T",
+    )
+
+    @Test
+    fun `a step decodes with its timing and gates`() {
+        val m = RowMapper.milestone(
+            stepRow("""{"title":"PCM","kind":"SUBJECT_CHOICE","timing":{"type":"school_years","from":"CLASS_11","to":"CLASS_12"},"gates":["g"]}"""),
+        )!!
+        assertEquals(Timing.SchoolYears(SchoolClass.CLASS_11, SchoolClass.CLASS_12), m.timing)
+        assertEquals(listOf("g"), m.gates)
+        assertEquals(Provenance.WITHHELD, m.provenance.verifiedBy)
+    }
+
+    @Test
+    fun `a step with a timing kind this build does not know is unreadable, not guessed`() {
+        assertNull(RowMapper.milestone(stepRow("""{"title":"t","kind":"TRAINING","timing":{"type":"by_age","years":17}}""")))
+    }
+
+    @Test
+    fun `a step with an unknown kind is unreadable`() {
+        assertNull(RowMapper.milestone(stepRow("""{"title":"t","kind":"INTERNSHIP","timing":{"type":"follows"}}""")))
     }
 }

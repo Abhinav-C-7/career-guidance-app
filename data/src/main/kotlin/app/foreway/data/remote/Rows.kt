@@ -49,3 +49,27 @@ internal data class WithdrawalRow(
     @SerialName("career_id") val careerId: String,
     @SerialName("withdrawn_at") val withdrawnAt: String,
 )
+
+@Serializable
+internal data class MilestoneRow(
+    val id: String,
+    @SerialName("career_id") val careerId: String,
+    val position: Int,
+    val review: String,
+    @SerialName("verification_window") val verificationWindow: String,
+    val body: JsonElement,
+    @SerialName("source_url") val sourceUrl: String,
+    @SerialName("source_authority") val sourceAuthority: String,
+    @SerialName("effective_from") val effectiveFrom: String,
+    @SerialName("effective_to") val effectiveTo: String? = null,
+    @SerialName("last_verified_at") val lastVerifiedAt: String,
+    @SerialName("applies_to") val appliesTo: JsonElement? = null,
+    @SerialName("updated_at") val updatedAt: String,
+)
+
+@Serializable
+internal data class MilestoneWithdrawalRow(
+    @SerialName("milestone_id") val milestoneId: String,
+    @SerialName("career_id") val careerId: String,
+    @SerialName("withdrawn_at") val withdrawnAt: String,
+)

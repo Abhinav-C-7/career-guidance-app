@@ -42,10 +42,18 @@ internal class PostgrestRemote(
     override suspend fun withdrawals(after: Cursor?, limit: Int): List<WithdrawalRow> =
         get(query(Stream.Withdrawals, after, limit), WithdrawalRow.serializer())
 
+    override suspend fun milestones(after: Cursor?, limit: Int): List<MilestoneRow> =
+        get(query(Stream.Milestones, after, limit), MilestoneRow.serializer())
+
+    override suspend fun milestoneWithdrawals(after: Cursor?, limit: Int): List<MilestoneWithdrawalRow> =
+        get(query(Stream.MilestoneWithdrawals, after, limit), MilestoneWithdrawalRow.serializer())
+
     internal enum class Stream(val relation: String, val at: String, val id: String) {
         Careers("published_careers", "updated_at", "id"),
         Criteria("published_criteria", "updated_at", "id"),
         Withdrawals("criteria_withdrawals", "withdrawn_at", "criterion_id"),
+        Milestones("published_milestones", "updated_at", "id"),
+        MilestoneWithdrawals("milestone_withdrawals", "withdrawn_at", "milestone_id"),
     }
 
     internal fun query(stream: Stream, after: Cursor?, limit: Int): String {

@@ -86,7 +86,7 @@ Android-only, native. No iOS, no cross-platform layer.
 | State | ViewModel + StateFlow, unidirectional | One immutable UI state per screen, exposed as a single flow |
 | DI | Hilt | |
 | Local store | **Room** | Source of truth on device. The app is local-first: a pathway must open with no network |
-| Backend (serving) | **Supabase** (Postgres, Storage, RLS), read over plain HTTPS from `:data` | Content store. The domain is deeply relational — careers, exams, criteria, pathways. The app reads only `published_careers`, `published_criteria` and `criteria_withdrawals`, never base tables |
+| Backend (serving) | **Supabase** (Postgres, Storage, RLS), read over plain HTTPS from `:data` | Content store. The domain is deeply relational — careers, exams, criteria, pathways. The app reads only the `published_*` views and the `*_withdrawals` tables, never base tables |
 | Backend (content service) | **Spring Boot (Kotlin) on Railway** | Fetches official sources on schedule, detects changes, extracts candidates with AI, runs the human review queue, publishes approved records. See "Two backends" below |
 | Serialization | kotlinx.serialization | |
 | Deadlines | WorkManager, inexact | Deadline reminders do not need minute precision; inexact work is far kinder to battery. Notifications are scheduled on-device from synced data — no push infrastructure in v1 |

@@ -35,6 +35,7 @@ import app.foreway.data.CareerSummary
 import app.foreway.domain.model.SchoolClass
 import app.foreway.ui.components.CriterionRow
 import app.foreway.ui.components.Gutter
+import app.foreway.ui.components.PrimaryCta
 import app.foreway.ui.components.TimelineRail
 import app.foreway.ui.format.familyLabel
 import app.foreway.ui.theme.ForewayColors
@@ -43,9 +44,12 @@ import app.foreway.ui.theme.ForewayTypography
 import app.foreway.ui.theme.LocalAccent
 
 @Composable
-fun HomeScreen(vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory)) {
+fun HomeScreen(
+    onOpenPathway: (careerId: String) -> Unit,
+    vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
+) {
     val state by vm.state.collectAsStateWithLifecycle()
-    HomeContent(state, onChooseCareer = vm::chooseGoal)
+    HomeContent(state, onChooseCareer = vm::chooseGoal, onOpenPathway = onOpenPathway)
 }
 
 /**
@@ -54,26 +58,31 @@ fun HomeScreen(vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory)) {
  * It reads only from the local store, so it opens with no network. There is no streak, no
  * percentage, no badge (DESIGN.md, anti-patterns).
  *
- * No primary CTA yet: its job is "view full pathway", and that screen does not exist. A
- * button that leads nowhere is worse than no button.
+ * The one CTA opens the full pathway, and only appears when there is a career to open.
  */
 @Composable
-fun HomeContent(state: HomeUiState, onChooseCareer: (String) -> Unit) {
+fun HomeContent(
+    state: HomeUiState,
+    onChooseCareer: (String) -> Unit,
+    onOpenPathway: (String) -> Unit = {},
+) {
     val family = (state as? HomeUiState.Ready)?.career?.family
     ForewayTheme(family = family) {
-        Box(
+        val ready = state as? HomeUiState.Ready
+        Column(
             Modifier
                 .fillMaxSize()
-                .background(ForewayColors.Canvas),
+                .background(ForewayColors.Canvas)
+                // Inset padding must sit OUTSIDE the scroll, or it scrolls away and
+                // content slides under the status bar.
+                .windowInsetsPadding(WindowInsets.statusBars),
         ) {
+            // The CTA sits below the scrolling content rather than over it, so the last
+            // criterion can never hide behind the button.
             Column(
                 Modifier
-                    .fillMaxSize()
-                    // Inset padding must sit OUTSIDE the scroll, or it scrolls away and
-                    // content slides under the status bar.
-                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .weight(1f)
                     .verticalScroll(rememberScrollState())
-                    .windowInsetsPadding(WindowInsets.navigationBars)
                     .padding(bottom = 24.dp),
             ) {
                 Spacer(Modifier.height(24.dp))
@@ -86,6 +95,15 @@ fun HomeContent(state: HomeUiState, onChooseCareer: (String) -> Unit) {
                         stringResource(R.string.home_not_downloaded_body),
                     )
                 }
+            }
+
+            if (ready != null) {
+                PrimaryCta(
+                    label = stringResource(R.string.home_view_pathway),
+                    onClick = { onOpenPathway(ready.career.id) },
+                )
+            } else {
+                Spacer(Modifier.windowInsetsPadding(WindowInsets.navigationBars))
             }
         }
     }

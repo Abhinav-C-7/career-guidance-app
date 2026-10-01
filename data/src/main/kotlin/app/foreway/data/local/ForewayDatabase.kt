@@ -1,5 +1,6 @@
 package app.foreway.data.local
 
+import androidx.room.AutoMigration
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Entity
@@ -36,6 +37,16 @@ internal data class CriterionEntity(
     val updatedAt: String,
 )
 
+@Entity(tableName = "milestones", indices = [Index("careerId")])
+internal data class MilestoneEntity(
+    @PrimaryKey val id: String,
+    val careerId: String,
+    val position: Int,
+    /** The MilestoneRow JSON as received. Mapped on read, like criteria. */
+    val row: String,
+    val updatedAt: String,
+)
+
 @Entity(tableName = "sync_cursors")
 internal data class SyncCursorEntity(
     @PrimaryKey val stream: String,
@@ -66,6 +77,18 @@ internal interface ContentDao {
     @Query("DELETE FROM criteria")
     suspend fun clearCriteria()
 
+    @Upsert
+    suspend fun upsertMilestones(rows: List<MilestoneEntity>)
+
+    @Query("DELETE FROM milestones WHERE id IN (:ids)")
+    suspend fun deleteMilestones(ids: List<String>)
+
+    @Query("DELETE FROM milestones")
+    suspend fun clearMilestones()
+
+    @Query("SELECT * FROM milestones WHERE careerId = :careerId ORDER BY position")
+    fun milestonesFor(careerId: String): Flow<List<MilestoneEntity>>
+
     @Query("DELETE FROM careers")
     suspend fun clearCareers()
 
@@ -92,9 +115,19 @@ internal interface ProfileDao {
 }
 
 @Database(
-    entities = [CareerEntity::class, CriterionEntity::class, SyncCursorEntity::class, ProfileEntity::class],
-    version = 1,
+    entities = [
+        CareerEntity::class,
+        CriterionEntity::class,
+        MilestoneEntity::class,
+        SyncCursorEntity::class,
+        ProfileEntity::class,
+    ],
+    version = 2,
     exportSchema = true,
+    // Additive changes only, so Room generates them from the exported schemas. A student's
+    // saved profile must survive every app update; a destructive migration would silently
+    // send them back through onboarding.
+    autoMigrations = [AutoMigration(from = 1, to = 2)],
 )
 internal abstract class ForewayDatabase : RoomDatabase() {
     abstract fun content(): ContentDao

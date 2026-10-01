@@ -24,7 +24,6 @@ import app.foreway.domain.model.GateOutcome
 import app.foreway.domain.model.LookupPointer
 import app.foreway.ui.format.describe
 import app.foreway.ui.format.displayValue
-import app.foreway.ui.format.monthAndYear
 import app.foreway.ui.theme.ForewayColors
 import app.foreway.ui.theme.ForewayTypography
 
@@ -102,44 +101,20 @@ fun CriterionRow(
  */
 @Composable
 private fun SourceChip(assessed: AssessedCriterion) {
-    val text: String
-    val colour: Color
-
-    when {
-        assessed.sourceGap -> {
-            val pointer = assessed.criterion.lookUpAt
-            text = if (pointer?.describedAs == LookupPointer.UNREADABLE_BY_THIS_VERSION) {
-                stringResource(R.string.chip_update_app)
-            } else if (pointer != null) {
-                stringResource(R.string.chip_no_figure_with_pointer, pointer.describedAs.take(48))
-            } else {
-                stringResource(R.string.chip_no_figure)
-            }
-            colour = ForewayColors.StateAttention
-        }
-        assessed.isStale -> {
-            text = stringResource(R.string.chip_needs_recheck, authorityLabel(assessed))
-            colour = ForewayColors.StateAttention
-        }
-        else -> {
-            val verified = assessed.criterion.requirement?.provenance?.lastVerifiedAt
-            text = stringResource(
-                R.string.chip_verified,
-                authorityLabel(assessed),
-                verified?.monthAndYear().orEmpty(),
-            )
-            colour = ForewayColors.InkFaint
-        }
+    if (!assessed.sourceGap) {
+        SourceLine(assessed.criterion.requirement?.provenance, assessed.isStale)
+        return
     }
-
-    Text(text = text, style = ForewayTypography.labelSmall, color = colour)
+    val pointer = assessed.criterion.lookUpAt
+    val text = if (pointer?.describedAs == LookupPointer.UNREADABLE_BY_THIS_VERSION) {
+        stringResource(R.string.chip_update_app)
+    } else if (pointer != null) {
+        stringResource(R.string.chip_no_figure_with_pointer, pointer.describedAs.take(48))
+    } else {
+        stringResource(R.string.chip_no_figure)
+    }
+    Text(text = text, style = ForewayTypography.labelSmall, color = ForewayColors.StateAttention)
 }
-
-private fun authorityLabel(assessed: AssessedCriterion): String =
-    assessed.criterion.requirement?.provenance?.authority?.name
-        ?.lowercase()?.replace('_', ' ')
-        ?.replaceFirstChar(Char::uppercase)
-        ?: "Source"
 
 private fun dotColour(outcome: GateOutcome): Color = when (outcome) {
     is GateOutcome.Met -> ForewayColors.StateMet

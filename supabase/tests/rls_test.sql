@@ -190,4 +190,76 @@ begin
     end if;
 end $$;
 
+-- --------------------------------------------------------------------------
+-- Milestones: only VERIFIED reaches a client, a demotion leaves a tombstone, and the
+-- database refuses both a self-signed step and a step posing as a gap.
+-- --------------------------------------------------------------------------
+
+insert into milestones (id, career_id, position, review, body, source_url, source_authority,
+                        effective_from, last_verified_at, verified_by)
+values
+    ('rls-step-verified', 'rls-test', 1, 'VERIFIED',
+     '{"title":"verified step","kind":"TRAINING","timing":{"type":"follows"}}'::jsonb,
+     'https://example.gov.in/x', 'OFFICIAL_NOTIFICATION', '2026-01-01', '2026-01-01', 'a-real-person'),
+    ('rls-step-unreviewed', 'rls-test', 2, 'NEEDS_REVIEW',
+     '{"title":"unreviewed step","kind":"TRAINING","timing":{"type":"follows"}}'::jsonb,
+     'https://example.gov.in/x', 'OFFICIAL_NOTIFICATION', '2026-01-01', '2026-01-01',
+     'automated-extraction-unreviewed');
+
+set local role anon;
+
+do $$
+declare
+    visible text[];
+begin
+    select array_agg(id order by id) into visible from published_milestones where career_id = 'rls-test';
+    if visible is distinct from array['rls-step-verified'] then
+        raise exception 'anon should see only the verified step, saw: %', coalesce(visible::text, 'nothing');
+    end if;
+
+    select array_agg(id order by id) into visible from milestones where career_id = 'rls-test';
+    if visible is distinct from array['rls-step-verified'] then
+        raise exception 'RLS on milestones leaks unreviewed steps: %', coalesce(visible::text, 'nothing');
+    end if;
+end $$;
+
+do $$
+declare
+    n int;
+begin
+    select count(*) into n from milestones_history;
+    if n <> 0 then
+        raise exception 'anon can see % milestone history rows; expected none', n;
+    end if;
+end $$;
+
+reset role;
+
+update milestones set review = 'NEEDS_REVIEW' where id = 'rls-step-verified';
+
+do $$
+begin
+    if not exists (select 1 from milestone_withdrawals where milestone_id = 'rls-step-verified') then
+        raise exception 'demoting a step left no withdrawal';
+    end if;
+end $$;
+
+do $$
+begin
+    update milestones set review = 'VERIFIED' where id = 'rls-step-unreviewed';
+    raise exception 'a step signed by the extraction pass was allowed to become VERIFIED';
+exception
+    when check_violation then
+        null; -- expected
+end $$;
+
+do $$
+begin
+    update milestones set review = 'KNOWN_UNSOURCED' where id = 'rls-step-unreviewed';
+    raise exception 'a milestone was allowed to become a declared gap';
+exception
+    when check_violation then
+        null; -- expected
+end $$;
+
 rollback;

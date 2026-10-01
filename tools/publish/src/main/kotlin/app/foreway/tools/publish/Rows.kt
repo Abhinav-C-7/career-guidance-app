@@ -4,7 +4,9 @@ import app.foreway.domain.model.Applicability
 import app.foreway.domain.model.CareerContent
 import app.foreway.domain.model.Criterion
 import app.foreway.domain.model.LookupPointer
+import app.foreway.domain.model.Milestone
 import app.foreway.domain.model.Requirement
+import app.foreway.domain.model.Timing
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
@@ -33,6 +35,12 @@ internal object Rows {
     )
 
     val careerColumns: List<String> = listOf("id", "title", "family", "notes")
+
+    val milestoneColumns: List<String> = listOf(
+        "id", "career_id", "position", "review", "verification_window", "body",
+        "source_url", "source_authority", "effective_from", "effective_to",
+        "last_verified_at", "verified_by", "applies_to",
+    )
 
     fun career(content: CareerContent): JsonObject = buildJsonObject {
         put("id", JsonPrimitive(content.careerId))
@@ -68,6 +76,32 @@ internal object Rows {
             )
             put("applies_to", json.encodeToJsonElement(Applicability.serializer(), c.appliesTo))
         }
+    }
+
+    /** [position] is the milestone's index in the authored list, so file order is pathway order. */
+    fun milestone(careerId: String, position: Int, m: Milestone): JsonObject = buildJsonObject {
+        put("id", JsonPrimitive(m.id))
+        put("career_id", JsonPrimitive(careerId))
+        put("position", JsonPrimitive(position))
+        put("review", JsonPrimitive(m.review.name))
+        put("verification_window", JsonPrimitive(m.window.name))
+        put(
+            "body",
+            buildJsonObject {
+                put("title", JsonPrimitive(m.title))
+                m.detail?.let { put("detail", JsonPrimitive(it)) }
+                put("kind", JsonPrimitive(m.kind.name))
+                put("timing", json.encodeToJsonElement(serializer<Timing>(), m.timing))
+                put("gates", json.encodeToJsonElement(serializer<List<String>>(), m.gates))
+            },
+        )
+        put("source_url", JsonPrimitive(m.provenance.sourceUrl))
+        put("source_authority", JsonPrimitive(m.provenance.authority.name))
+        put("effective_from", JsonPrimitive(m.provenance.effectiveFrom.toString()))
+        put("effective_to", m.provenance.effectiveTo?.toString().orNull())
+        put("last_verified_at", JsonPrimitive(m.provenance.lastVerifiedAt.toString()))
+        put("verified_by", JsonPrimitive(m.provenance.verifiedBy))
+        put("applies_to", json.encodeToJsonElement(Applicability.serializer(), m.appliesTo))
     }
 
     private fun String?.orNull(): JsonElement = if (this == null) JsonNull else JsonPrimitive(this)

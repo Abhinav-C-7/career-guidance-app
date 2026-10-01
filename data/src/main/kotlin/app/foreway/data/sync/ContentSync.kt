@@ -2,6 +2,8 @@ package app.foreway.data.sync
 
 import app.foreway.data.remote.CareerRow
 import app.foreway.data.remote.CriterionRow
+import app.foreway.data.remote.MilestoneRow
+import app.foreway.data.remote.MilestoneWithdrawalRow
 import app.foreway.data.remote.RowMapper
 import app.foreway.data.remote.WithdrawalRow
 import kotlinx.coroutines.sync.Mutex
@@ -10,12 +12,14 @@ import kotlinx.coroutines.sync.withLock
 /** A position in one stream: the last (timestamp, id) pair received, exactly as sent. */
 internal data class Cursor(val at: String, val id: String)
 
-internal enum class Stream { CAREERS, CRITERIA, WITHDRAWALS }
+internal enum class Stream { CAREERS, CRITERIA, WITHDRAWALS, MILESTONES, MILESTONE_WITHDRAWALS }
 
 internal interface ContentRemote {
     suspend fun careers(after: Cursor?, limit: Int): List<CareerRow>
     suspend fun criteria(after: Cursor?, limit: Int): List<CriterionRow>
     suspend fun withdrawals(after: Cursor?, limit: Int): List<WithdrawalRow>
+    suspend fun milestones(after: Cursor?, limit: Int): List<MilestoneRow>
+    suspend fun milestoneWithdrawals(after: Cursor?, limit: Int): List<MilestoneWithdrawalRow>
 }
 
 internal interface ContentStore {
@@ -31,6 +35,8 @@ internal data class SyncUpdate(
     val careers: List<CareerRow>,
     val criteria: List<CriterionRow>,
     val withdrawnIds: List<String>,
+    val milestones: List<MilestoneRow> = emptyList(),
+    val withdrawnMilestoneIds: List<String> = emptyList(),
     val cursors: Map<Stream, Cursor>,
 )
 
@@ -38,6 +44,7 @@ public data class SyncResult(
     val careers: Int,
     val criteria: Int,
     val withdrawn: Int,
+    val milestones: Int = 0,
     /** Rows this build could not read. Non-zero means students on this version should update. */
     val unreadable: Int,
 )
@@ -75,15 +82,25 @@ public class ContentSync internal constructor(
         // Withdrawals keep their cursor even on a full run: old tombstones refer only to
         // criteria that are already absent from the full set, so replaying them is waste.
         val withdrawalsFrom = store.cursor(Stream.WITHDRAWALS)
+        val milestonesFrom = if (full) null else store.cursor(Stream.MILESTONES)
+        val milestoneWithdrawalsFrom = store.cursor(Stream.MILESTONE_WITHDRAWALS)
 
         val careers = drain(careerFrom, remote::careers) { Cursor(it.updatedAt, it.id) }
         val criteria = drain(criteriaFrom, remote::criteria) { Cursor(it.updatedAt, it.id) }
         val withdrawals = drain(withdrawalsFrom, remote::withdrawals) { Cursor(it.withdrawnAt, it.criterionId) }
+        val milestones = drain(milestonesFrom, remote::milestones) { Cursor(it.updatedAt, it.id) }
+        val milestoneWithdrawals = drain(milestoneWithdrawalsFrom, remote::milestoneWithdrawals) {
+            Cursor(it.withdrawnAt, it.milestoneId)
+        }
 
         val cursors = buildMap {
             careers.lastOrNull()?.let { put(Stream.CAREERS, Cursor(it.updatedAt, it.id)) }
             criteria.lastOrNull()?.let { put(Stream.CRITERIA, Cursor(it.updatedAt, it.id)) }
             withdrawals.lastOrNull()?.let { put(Stream.WITHDRAWALS, Cursor(it.withdrawnAt, it.criterionId)) }
+            milestones.lastOrNull()?.let { put(Stream.MILESTONES, Cursor(it.updatedAt, it.id)) }
+            milestoneWithdrawals.lastOrNull()?.let {
+                put(Stream.MILESTONE_WITHDRAWALS, Cursor(it.withdrawnAt, it.milestoneId))
+            }
         }
 
         // A criterion cannot be both published and withdrawn at once — the server trigger
@@ -94,6 +111,8 @@ public class ContentSync internal constructor(
                 careers = careers,
                 criteria = criteria,
                 withdrawnIds = withdrawals.map { it.criterionId },
+                milestones = milestones,
+                withdrawnMilestoneIds = milestoneWithdrawals.map { it.milestoneId },
                 cursors = cursors,
             ),
         )
@@ -101,8 +120,10 @@ public class ContentSync internal constructor(
         return SyncResult(
             careers = careers.size,
             criteria = criteria.size,
-            withdrawn = withdrawals.size,
-            unreadable = criteria.count { RowMapper.isUnreadable(RowMapper.criterion(it)) },
+            withdrawn = withdrawals.size + milestoneWithdrawals.size,
+            milestones = milestones.size,
+            unreadable = criteria.count { RowMapper.isUnreadable(RowMapper.criterion(it)) } +
+                milestones.count { RowMapper.milestone(it) == null },
         )
     }
 

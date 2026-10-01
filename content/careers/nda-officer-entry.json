@@ -12,7 +12,10 @@
     "PHYSICAL STANDARDS, PARTIAL: the figures below come from 'Manual on Medical Examination and Medical Standards for Various Entries into the Army, Trg Academies and Mil Schools', an appendix to O/o DGMS(Army) letter 76054/Policy/DGMS-5A dated 16 Jul 2019. Section (m) of it is explicitly headed 'NDA, 10+2 TES & equivalent undergraduate 10+2 entries', so the scope is right. The DATE is the problem: UPSC's 2026 notification cites a Joint Order Manual (1st Edition) that post-dates this. Treat every figure here as a candidate to check against that newer document, not as current fact.",
     "MODEL GAP, BLOCKS PUBLICATION of the two height criteria: the 2019 manual grants a lower minimum to Gorkhas and to candidates from the hills of the North East, Garhwal and Kumaon (152 cm male, 148 cm female against 157/152). Applicability can scope by sex, state and board but has no community dimension. A relaxation we fail to model makes us tell a student they are too short when they are not, which is the worst direction to be wrong in. Both height criteria stay DRAFT until this is fixed.",
     "MODEL GAP: the Flying Branch minimum height is 163 cm and its visual standard is stricter (CP I). Neither is recorded, because Applicability still cannot express which branch or wing a candidate is applying for. Same gap that blocks nda-pcm-air-force-naval.",
-    "The growth allowance in EvaluationPolicy (2 cm below 18 years) is taken from para 51 of this same manual, not invented."
+    "The growth allowance in EvaluationPolicy (2 cm below 18 years) is taken from para 51 of this same manual, not invented.",
+    "MILESTONES (added 2026-10-02, NEEDS_REVIEW): extracted from the same UPSC notice (SHA-256 1a55cc500bf8263f6ade9f94f08e5b414a99ed38252a90242a2bce36dacb3981). Evidence pages: PCM for Air Force/Navy wings p.8; applying while appearing in class 12 p.8, and Note 1 (11th class not eligible) p.8-9; exam scheme, Maths 300 + GAT 600 + SSB 900, p.19; written exam then SSB p.5; SSB two-stage procedure and CPSS p.16; CPSS given only once and a fail bars the flying branch p.16; medical board and appeal p.30; 3 years at NDA, JNU degrees, IMA one year, service academies p.35.",
+    "nda-cpss-not-failed is DRAFT for the same model gap as nda-pcm-air-force-naval: it applies only to candidates opting for the Air Force flying branch, and Applicability cannot express a wing or branch yet.",
+    "NOT a milestone, deliberately: this cycle's dates (applications 20.05.2026 to 09.06.2026, exam 13.09.2026, course from 1 July 2027). Those are deadlines, which change every cycle, and belong to the deadlines feature. The 4-year Naval Academy 10+2 (INAC) track is also not modelled as its own pathway yet."
   ],
   "criteria": [
     {
@@ -302,6 +305,163 @@
         "url": "https://joinindianarmy.nic.in",
         "citedBy": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf"
       }
+    },
+    {
+      "id": "nda-cpss-not-failed",
+      "label": "Not previously failed the pilot aptitude test (CPSS), for the Air Force flying branch",
+      "review": "DRAFT",
+      "window": "ANNUAL",
+      "requirement": {
+        "value": {
+          "type": "no_prior_disqualification",
+          "code": "CPSS_FAILED"
+        },
+        "provenance": {
+          "sourceUrl": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2026-05-20",
+          "lastVerifiedAt": "2026-10-02",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "nda-step-pcm",
+      "title": "Physics, Chemistry and Maths in class 11 and 12, for the Air Force and Navy wings",
+      "detail": "The Army wing accepts a class 12 pass in any stream. The Air Force and Navy wings, and the Naval Academy's 10+2 entry, need Physics, Chemistry and Mathematics.",
+      "kind": "SUBJECT_CHOICE",
+      "timing": {
+        "type": "school_years",
+        "from": "CLASS_11",
+        "to": "CLASS_12"
+      },
+      "gates": [
+        "nda-pcm-air-force-naval"
+      ],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2026-05-20",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    },
+    {
+      "id": "nda-step-written",
+      "title": "Apply, and sit the NDA written exam",
+      "detail": "You can apply while appearing in class 12, but not while in class 11. The written exam has two papers: Mathematics (300 marks) and the General Ability Test (600 marks).",
+      "kind": "ENTRANCE_EXAM",
+      "timing": {
+        "type": "from_stage",
+        "stage": "CLASS_12"
+      },
+      "gates": [
+        "nda-class-12",
+        "nda-dob-window-ii-2026",
+        "nda-nationality",
+        "nda-marital-status",
+        "nda-not-debarred-by-mod",
+        "nda-no-academy-withdrawal"
+      ],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2026-05-20",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    },
+    {
+      "id": "nda-step-ssb",
+      "title": "Services Selection Board interview",
+      "detail": "Clear the written exam's qualifying marks and you are called for the SSB's intelligence and personality test, worth 900 marks. It runs in two stages, and only those who clear stage one continue. Air Force candidates also take the Computerised Pilot Selection System, which each candidate gets only once: failing it rules out the Air Force flying branch through NDA.",
+      "kind": "SELECTION_INTERVIEW",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [
+        "nda-cpss-not-failed"
+      ],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2026-05-20",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    },
+    {
+      "id": "nda-step-medical",
+      "title": "Medical examination",
+      "detail": "Candidates recommended by the SSB are examined by a Board of Service Medical Officers, and only those declared fit are admitted. If you are declared unfit, you can request an Appeal Medical Board.",
+      "kind": "MEDICAL",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [
+        "nda-height-male-cadet",
+        "nda-height-female-cadet",
+        "nda-chest-minimum",
+        "nda-visual-standard-army",
+        "nda-colour-vision-army",
+        "nda-tattoo-placement",
+        "nda-physical-standards"
+      ],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2026-05-20",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    },
+    {
+      "id": "nda-step-academy",
+      "title": "Three years at the National Defence Academy",
+      "detail": "Academic and physical training, common to all three wings for the first two and a half years. Every cadet earns a degree from Jawaharlal Nehru University; for B.Tech cadets it is awarded after the next stage of training.",
+      "kind": "TRAINING",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2026-05-20",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    },
+    {
+      "id": "nda-step-service-academy",
+      "title": "Training at your service's academy",
+      "detail": "Army cadets go on to the Indian Military Academy, Dehradun, for a further year. Naval cadets go to the Indian Naval Academy, Ezhimala; Air Force cadets to the Air Force Academy, Hyderabad, or the Air Force Technical College, Bengaluru.",
+      "kind": "TRAINING",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://www.upsc.gov.in/sites/default/files/Notif-NDA-II-2026-Engl-200526.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2026-05-20",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
     }
   ]
 }

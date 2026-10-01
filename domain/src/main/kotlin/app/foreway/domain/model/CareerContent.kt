@@ -19,6 +19,8 @@ public data class CareerContent(
      */
     val notes: List<String> = emptyList(),
     val criteria: List<Criterion>,
+    /** The steps of the pathway, in order. */
+    val milestones: List<Milestone> = emptyList(),
 )
 
 /** Drives the accent colour in DESIGN.md. One family per career. */
