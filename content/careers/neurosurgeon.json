@@ -1,0 +1,54 @@
+{
+  "careerId": "neurosurgeon",
+  "title": "Neurosurgeon (MCh)",
+  "family": "MEDICAL",
+  "parentId": "surgeon-general-surgery",
+  "summary": "Operates on the brain, spine and nerves.",
+  "notes": [
+    "NOTHING here is VERIFIED. Extracted by an automated pass on 2026-10-02 from the primary documents named below; a person must check each value against the cited page and sign it in the review screen.",
+    "SOURCES: NBEMS Information Bulletin NEET-SS 2025 (SHA-256 f09b6a60dea2f628b27504a033b43c1c96fa2a179d917acff4bd6682c57e8732).",
+    "Evidence pages, NEET-SS 2025: neurosurgery in the surgical group, feeder MS/DNB General Surgery p.19; eligibility, MD/MS/DNB by cut-off 31.01.2026, NMC/State Medical Council registration mandatory p.62.",
+    "MODEL GAP: some institutes run a direct six-year MCh in neurosurgery straight after MBBS. That route is not sourced here and not modelled; this pathway shows the route through General Surgery."
+  ],
+  "criteria": [],
+  "milestones": [
+    {
+      "id": "mch-step-neetss",
+      "title": "Sit NEET-SS in the surgical group",
+      "detail": "NEET-SS is the entrance exam for DM, MCh and DrNB super-specialty courses. Neurosurgery is in the surgical group, open to those holding MS or DNB in General Surgery by the cut-off date (31 January 2026 for NEET-SS 2025). Registration with the NMC or a State Medical Council is mandatory.",
+      "kind": "ENTRANCE_EXAM",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://nbe.edu.in/IB/NEET-SS%202025%20information%20bulletin.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2025-11-05",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    },
+    {
+      "id": "mch-step-neurosurgery",
+      "title": "MCh in Neurosurgery",
+      "detail": "The super-specialty degree in neurosurgery, allotted through NEET-SS counselling.",
+      "kind": "TRAINING",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://nbe.edu.in/IB/NEET-SS%202025%20information%20bulletin.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2025-11-05",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    }
+  ]
+}

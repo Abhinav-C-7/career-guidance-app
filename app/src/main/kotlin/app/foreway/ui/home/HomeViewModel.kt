@@ -12,17 +12,15 @@ import app.foreway.data.profile.ProfileRepository
 import app.foreway.domain.engine.GateEvaluator
 import app.foreway.domain.model.AssessedCriterion
 import app.foreway.domain.model.GateOutcome
+import app.foreway.domain.model.Lineage
 import app.foreway.ui.today
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 
 sealed interface HomeUiState {
@@ -38,7 +36,10 @@ sealed interface HomeUiState {
         val career: CareerSummary,
         /** Null when we were not told the class. We do not guess a position in time. */
         val rail: Rail?,
+        /** Every gate in the career's chain: a neurosurgeon's include a doctor's. */
         val assessed: List<AssessedCriterion>,
+        /** The next level down, offered as "go further". */
+        val specialisations: List<CareerSummary> = emptyList(),
     ) : HomeUiState
 }
 
@@ -50,7 +51,7 @@ sealed interface HomeUiState {
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModel(
     content: ContentRepository,
-    private val profiles: ProfileRepository,
+    profiles: ProfileRepository,
     today: () -> LocalDate,
     evaluator: GateEvaluator = GateEvaluator(),
 ) : ViewModel() {
@@ -60,29 +61,27 @@ class HomeViewModel(
             val goal = saved?.goalCareerId
             when {
                 saved == null -> flowOf(HomeUiState.Loading)
-                goal == null -> content.careers().map { HomeUiState.NoGoal(it) }
-                else -> combine(content.careers(), content.criteriaFor(goal)) { careers, criteria ->
+                goal == null -> content.careers().map { all -> HomeUiState.NoGoal(all.filter { it.parentId == null }) }
+                else -> content.careers().flatMapLatest { careers ->
                     val career = careers.firstOrNull { it.id == goal }
                     if (career == null) {
-                        HomeUiState.NotDownloaded
+                        flowOf(HomeUiState.NotDownloaded)
                     } else {
-                        HomeUiState.Ready(
-                            career = career,
-                            rail = saved.profile.currentClass?.let(::railFor),
-                            assessed = ordered(evaluator.assess(criteria, saved.profile, today())),
-                        )
+                        val byId = careers.associateBy { it.id }
+                        val chain = Lineage.chain(goal) { byId[it]?.parentId }
+                        content.criteriaFor(chain).map { criteria ->
+                            HomeUiState.Ready(
+                                career = career,
+                                rail = saved.profile.currentClass?.let(::railFor),
+                                assessed = ordered(evaluator.assess(criteria, saved.profile, today())),
+                                specialisations = careers.filter { it.parentId == goal },
+                            )
+                        }
                     }
                 }
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState.Loading)
-
-    fun chooseGoal(careerId: String) {
-        viewModelScope.launch {
-            val saved = profiles.saved.first() ?: return@launch
-            profiles.save(saved.copy(goalCareerId = careerId))
-        }
-    }
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

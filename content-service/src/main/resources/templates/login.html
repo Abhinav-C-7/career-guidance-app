@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments :: head('Sign in')}"></head>
+<body>
+<main class="narrow">
+    <h1>Foreway review</h1>
+    <p class="muted">Sign-offs here put eligibility facts in front of students. Sign in with your reviewer account.</p>
+
+    <p th:if="${param.error}" class="refused">Wrong name or password.</p>
+    <p th:if="${param.out}" class="done">Signed out.</p>
+
+    <form th:action="@{/login}" method="post" class="stack">
+        <label>Name <input type="text" name="username" autocomplete="username" required autofocus></label>
+        <label>Password <input type="password" name="password" autocomplete="current-password" required></label>
+        <button type="submit" class="primary">Sign in</button>
+    </form>
+</main>
+</body>
+</html>

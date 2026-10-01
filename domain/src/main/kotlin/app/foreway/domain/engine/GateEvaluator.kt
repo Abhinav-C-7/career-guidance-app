@@ -107,6 +107,7 @@ public class GateEvaluator(
         asOf: LocalDate,
     ): GateOutcome = when (requirement) {
         is Requirement.BornBetween -> evaluateBornBetween(requirement, profile)
+        is Requirement.BornOnOrBefore -> evaluateBornOnOrBefore(requirement, profile)
         is Requirement.BodyMetric -> evaluateBodyMetric(requirement, profile, asOf)
         is Requirement.ColourVision -> evaluateColourVision(requirement, profile)
         is Requirement.VisualStandard -> evaluateVisualStandard(requirement, profile)
@@ -134,6 +135,16 @@ public class GateEvaluator(
             dob > requirement.latest -> GateOutcome.AtRisk(RiskReason.TooYoungForCycle)
             else -> GateOutcome.Met
         }
+    }
+
+    /** No upper limit, so nothing here can close a door: too young is a later cycle. */
+    private fun evaluateBornOnOrBefore(
+        requirement: Requirement.BornOnOrBefore,
+        profile: StudentProfile,
+    ): GateOutcome {
+        val dob = profile.dateOfBirth
+            ?: return GateOutcome.NotYetAssessed(MissingInput.DATE_OF_BIRTH)
+        return if (dob <= requirement.latest) GateOutcome.Met else GateOutcome.AtRisk(RiskReason.TooYoungForCycle)
     }
 
     private fun evaluateBodyMetric(
@@ -282,6 +293,9 @@ public class GateEvaluator(
             ?: return GateOutcome.NotYetAssessed(MissingInput.SUBJECTS_TAKEN)
         val missing = requirement.subjects - taken
         if (missing.isEmpty()) return GateOutcome.Met
+        if (requirement.addableAfterwards && hasPassed(profile, requirement.atStage)) {
+            return GateOutcome.AtRisk(RiskReason.SubjectsCanStillBeAdded(missing))
+        }
         return if (hasPassed(profile, requirement.atStage)) {
             GateOutcome.CannotBeMet(
                 reason = BlockReason.SubjectsLocked(missing),

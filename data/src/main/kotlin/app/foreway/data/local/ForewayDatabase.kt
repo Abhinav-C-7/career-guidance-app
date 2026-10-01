@@ -1,6 +1,7 @@
 package app.foreway.data.local
 
 import androidx.room.AutoMigration
+import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Entity
@@ -26,6 +27,10 @@ internal data class CareerEntity(
     /** Raw, so an unknown family from a newer server is stored rather than rejected. */
     val family: String,
     val updatedAt: String,
+    val parentId: String? = null,
+    val summary: String? = null,
+    @ColumnInfo(defaultValue = "1")
+    val regulated: Boolean = true,
 )
 
 @Entity(tableName = "criteria", indices = [Index("careerId")])
@@ -86,8 +91,8 @@ internal interface ContentDao {
     @Query("DELETE FROM milestones")
     suspend fun clearMilestones()
 
-    @Query("SELECT * FROM milestones WHERE careerId = :careerId ORDER BY position")
-    fun milestonesFor(careerId: String): Flow<List<MilestoneEntity>>
+    @Query("SELECT * FROM milestones WHERE careerId IN (:careerIds) ORDER BY position")
+    fun milestonesFor(careerIds: List<String>): Flow<List<MilestoneEntity>>
 
     @Query("DELETE FROM careers")
     suspend fun clearCareers()
@@ -95,8 +100,8 @@ internal interface ContentDao {
     @Query("SELECT * FROM careers ORDER BY title")
     fun careers(): Flow<List<CareerEntity>>
 
-    @Query("SELECT * FROM criteria WHERE careerId = :careerId ORDER BY id")
-    fun criteriaFor(careerId: String): Flow<List<CriterionEntity>>
+    @Query("SELECT * FROM criteria WHERE careerId IN (:careerIds) ORDER BY id")
+    fun criteriaFor(careerIds: List<String>): Flow<List<CriterionEntity>>
 
     @Query("SELECT * FROM sync_cursors WHERE stream = :stream")
     suspend fun cursor(stream: String): SyncCursorEntity?
@@ -122,12 +127,12 @@ internal interface ProfileDao {
         SyncCursorEntity::class,
         ProfileEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
     // Additive changes only, so Room generates them from the exported schemas. A student's
     // saved profile must survive every app update; a destructive migration would silently
     // send them back through onboarding.
-    autoMigrations = [AutoMigration(from = 1, to = 2)],
+    autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3)],
 )
 internal abstract class ForewayDatabase : RoomDatabase() {
     abstract fun content(): ContentDao

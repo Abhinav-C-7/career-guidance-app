@@ -23,8 +23,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import app.foreway.ForewayApp
 import app.foreway.data.profile.ProfileRepository
+import app.foreway.ui.CareerRoute
 import app.foreway.ui.HomeRoute
 import app.foreway.ui.PathwayRoute
+import app.foreway.ui.browse.CareerBrowserScreen
 import app.foreway.ui.home.HomeScreen
 import app.foreway.ui.pathway.PathwayScreen
 import app.foreway.ui.onboarding.OnboardingScreen
@@ -83,7 +85,19 @@ private fun ForewayNavHost() {
         popExitTransition = { slideOutHorizontally(spec) { it } },
     ) {
         composable<HomeRoute> {
-            HomeScreen(onOpenPathway = { id -> nav.navigate(PathwayRoute(id)) })
+            HomeScreen(
+                onOpenPathway = { id -> nav.navigate(PathwayRoute(id)) },
+                onOpenCareer = { id -> nav.navigate(CareerRoute(id)) },
+                onBrowse = { nav.navigate(CareerRoute()) },
+            )
+        }
+        composable<CareerRoute> {
+            CareerBrowserScreen(
+                onOpen = { id -> nav.navigate(CareerRoute(id)) },
+                // Back to home, dropping the browsing trail: the new goal is home's subject now.
+                onGoalChosen = { nav.popBackStack(HomeRoute, inclusive = false) },
+                onBack = { nav.popBackStack() },
+            )
         }
         composable<PathwayRoute> {
             PathwayScreen(onBack = { nav.popBackStack() })

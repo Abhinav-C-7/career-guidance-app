@@ -24,7 +24,9 @@ internal class RoomContentStore(private val db: ForewayDatabase) : ContentStore 
                 dao.clearCareers()
             }
             dao.upsertCareers(
-                update.careers.map { CareerEntity(it.id, it.title, it.family, it.updatedAt) },
+                update.careers.map {
+                    CareerEntity(it.id, it.title, it.family, it.updatedAt, it.parentId, it.summary, it.regulated)
+                },
             )
             dao.upsertCriteria(
                 update.criteria.map {

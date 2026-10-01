@@ -193,4 +193,23 @@
         <item quantity="one">One step needs a newer version of the app. Update to see it.</item>
         <item quantity="other">%1$d steps need a newer version of the app. Update to see them.</item>
     </plurals>
+
+    <!-- Career tree -->
+    <string name="risk_subjects_addable">Not taken yet: %1$s. You can still pass them later as additional subjects.</string>
+    <string name="home_all_careers">All careers</string>
+    <string name="home_go_further">Go further</string>
+    <string name="home_go_further_body">Specialisations that build on this career. Each includes every step above it.</string>
+    <string name="home_no_gates_unregulated">No eligibility gates: this career has no licence or mandatory exam.</string>
+    <string name="unregulated_note">No licence or entrance exam is required for this career. Its pathway shows common routes, not rules — other routes are just as valid.</string>
+    <string name="browse_title">Choose a career</string>
+    <string name="browse_body">Pick a field, then go as specific as you like. Every specialisation includes the steps of the careers it builds on.</string>
+    <string name="browse_all">See all careers</string>
+    <string name="browse_make_goal">Make this my goal</string>
+    <string name="browse_is_goal">This is your goal</string>
+    <plurals name="browse_specialisations">
+        <item quantity="one">%1$d specialisation</item>
+        <item quantity="other">%1$d specialisations</item>
+    </plurals>
+    <string name="pathway_common_route">Common route, not a rule</string>
+    <string name="pathway_builds_on">Builds on: %1$s</string>
 </resources>

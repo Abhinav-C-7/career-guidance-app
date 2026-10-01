@@ -15,12 +15,14 @@ import app.foreway.data.profile.ProfileRepository
 import app.foreway.domain.engine.GateEvaluator
 import app.foreway.domain.engine.Pathway
 import app.foreway.domain.engine.PathwayBuilder
+import app.foreway.domain.model.Lineage
 import app.foreway.domain.model.SchoolClass
 import app.foreway.ui.PathwayRoute
 import app.foreway.ui.today
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.LocalDate
 
@@ -34,6 +36,8 @@ sealed interface PathwayUiState {
         val studentClass: SchoolClass?,
         val pathway: Pathway,
         val unreadableSteps: Int,
+        /** Broader careers whose steps this pathway includes, root first. */
+        val buildsOn: List<CareerSummary> = emptyList(),
     ) : PathwayUiState
 }
 
@@ -43,6 +47,7 @@ sealed interface PathwayUiState {
  * student's school years and hangs each gate on its step. Deterministic, offline, and
  * with no model anywhere in the path (ARCHITECTURE.md).
  */
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class PathwayViewModel(
     careerId: String,
     content: ContentRepository,
@@ -52,26 +57,35 @@ class PathwayViewModel(
     builder: PathwayBuilder = PathwayBuilder(),
 ) : ViewModel() {
 
-    val state: StateFlow<PathwayUiState> = combine(
-        profiles.saved,
-        content.careers(),
-        content.criteriaFor(careerId),
-        content.milestonesFor(careerId),
-    ) { saved, careers, criteria, steps ->
-        val career = careers.firstOrNull { it.id == careerId }
-        if (saved == null || career == null) {
-            if (saved == null) PathwayUiState.Loading else PathwayUiState.NotDownloaded
-        } else {
-            val asOf = today()
-            val assessed = evaluator.assess(criteria, saved.profile, asOf)
-            PathwayUiState.Ready(
-                career = career,
-                studentClass = saved.profile.currentClass,
-                pathway = builder.build(steps.milestones, assessed, saved.profile, asOf),
-                unreadableSteps = steps.unreadable,
-            )
+    /**
+     * A specialisation's pathway is its whole chain: a neurosurgeon's starts with NEET (UG),
+     * runs through MBBS and NEET-PG, and ends with NEET-SS and the MCh. Each level stores only
+     * its own steps; the chain is assembled here, root first.
+     */
+    val state: StateFlow<PathwayUiState> = content.careers()
+        .flatMapLatest { careers ->
+            val byId = careers.associateBy { it.id }
+            val chain = Lineage.chain(careerId) { byId[it]?.parentId }
+            combine(profiles.saved, content.criteriaFor(chain), content.milestonesFor(chain)) { saved, criteria, steps ->
+                val career = byId[careerId]
+                when {
+                    saved == null -> PathwayUiState.Loading
+                    career == null -> PathwayUiState.NotDownloaded
+                    else -> {
+                        val asOf = today()
+                        val assessed = evaluator.assess(criteria, saved.profile, asOf)
+                        PathwayUiState.Ready(
+                            career = career,
+                            studentClass = saved.profile.currentClass,
+                            pathway = builder.build(steps.milestones, assessed, saved.profile, asOf),
+                            unreadableSteps = steps.unreadable,
+                            buildsOn = chain.dropLast(1).mapNotNull { byId[it] },
+                        )
+                    }
+                }
+            }
         }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PathwayUiState.Loading)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PathwayUiState.Loading)
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

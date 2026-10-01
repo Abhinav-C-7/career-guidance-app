@@ -1,0 +1,35 @@
+{
+  "careerId": "specialist-md-ms",
+  "title": "Specialist doctor (MD or MS)",
+  "family": "MEDICAL",
+  "parentId": "doctor-mbbs",
+  "summary": "A doctor with a postgraduate degree in one field: MD for the medical specialties, MS for the surgical ones.",
+  "notes": [
+    "NOTHING here is VERIFIED. Extracted by an automated pass on 2026-10-02 from the primary documents named below; a person must check each value against the cited page and sign it in the review screen.",
+    "SOURCES: NBEMS Information Bulletin NEET-PG 2025 (SHA-256 bbf1c02f3e32986f2bdfd258786290f485f14150a07df528b3c9b74b9a301237).",
+    "Evidence pages, NEET-PG 2025: single entrance exam for MD/MS/PG Diploma, no state or institute exam valid p.61; eligibility MBBS, permanent or provisional registration, internship complete by 31 July 2025 p.70.",
+    "Durations of MD and MS are not stated in this bulletin and are deliberately not given."
+  ],
+  "criteria": [],
+  "milestones": [
+    {
+      "id": "pg-step-neetpg",
+      "title": "Sit NEET-PG",
+      "detail": "NEET-PG is the only entrance exam for MD, MS and PG Diploma seats; no state or institute exam replaces it. To sit it you need your MBBS, NMC or State Medical Council registration, and your internship complete by the cut-off date (31 July for NEET-PG 2025).",
+      "kind": "ENTRANCE_EXAM",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://nbe.edu.in/IB/IB%20NEET-PG%202025.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2025-04-17",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    }
+  ]
+}

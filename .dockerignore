@@ -1,0 +1,13 @@
+# Belt and braces: the Dockerfile copies named paths only, but nothing secret or bulky
+# should ever be in the build context either.
+.env
+.env.*
+local.properties
+**/build
+.gradle
+.kotlin
+.idea
+app
+data
+content
+supabase

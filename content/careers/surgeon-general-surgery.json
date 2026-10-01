@@ -1,0 +1,34 @@
+{
+  "careerId": "surgeon-general-surgery",
+  "title": "General surgeon (MS)",
+  "family": "MEDICAL",
+  "parentId": "specialist-md-ms",
+  "summary": "Operates across the body, and is the gateway to most surgical super-specialties.",
+  "notes": [
+    "NOTHING here is VERIFIED. Extracted by an automated pass on 2026-10-02 from the primary documents named below; a person must check each value against the cited page and sign it in the review screen.",
+    "SOURCES: NBEMS Information Bulletin NEET-SS 2025 (SHA-256 f09b6a60dea2f628b27504a033b43c1c96fa2a179d917acff4bd6682c57e8732).",
+    "Evidence page, NEET-SS 2025 p.19: the surgical group's feeder qualification is MS/DNB General Surgery, and the group covers neurosurgery, cardiovascular and thoracic surgery, paediatric surgery, plastic surgery, urology, surgical oncology and others."
+  ],
+  "criteria": [],
+  "milestones": [
+    {
+      "id": "ms-step-general-surgery",
+      "title": "MS (or DNB) in General Surgery",
+      "detail": "Choose General Surgery when you are allotted a postgraduate seat. It is the qualification NEET-SS accepts for the surgical super-specialties, from neurosurgery to urology.",
+      "kind": "TRAINING",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://nbe.edu.in/IB/NEET-SS%202025%20information%20bulletin.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2025-11-05",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    }
+  ]
+}

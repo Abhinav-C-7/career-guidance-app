@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments :: head(${view.record.label})}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main th:with="r=${view.record}">
+    <p><a th:href="@{/}">← Queue</a></p>
+
+    <p th:if="${done}" class="done" th:text="${done}">done</p>
+    <p th:if="${refused}" class="refused" th:text="${refused}">refused</p>
+
+    <p class="eyebrow" th:text="|${view.careerTitle} · ${view.kindLabel}|">Career · Criterion</p>
+    <h1 th:text="${r.label}">Label</h1>
+    <p><span class="state" th:text="${r.review}">STATE</span> <code th:text="${r.id}">id</code></p>
+
+    <p th:if="${view.unreadableReason}" class="refused">
+        The app cannot read this record: <span th:text="${view.unreadableReason}">why</span>
+    </p>
+
+    <section class="card">
+        <h2>What students would be told</h2>
+        <p th:if="${view.timing}" class="muted" th:text="${view.timing}">timing</p>
+        <p th:if="${view.necessity}"><strong th:text="${view.necessity}">Rule</strong></p>
+        <p class="value" th:text="${view.summary} ?: 'No value: this is a declared gap.'">value</p>
+        <p th:if="${view.detail}" th:text="${view.detail}">detail</p>
+        <p th:unless="${view.gates.isEmpty()}">Gates checked at this step:
+            <code th:text="${#strings.listJoin(view.gates, ', ')}">gates</code></p>
+        <p>Applies to: <strong th:text="${view.appliesTo}">Everyone</strong></p>
+        <details>
+            <summary>Exact JSON sent to phones</summary>
+            <pre th:if="${view.payloadJson}" th:text="${view.payloadJson}">{}</pre>
+            <pre th:if="${view.lookUpAtJson}" th:text="${view.lookUpAtJson}">{}</pre>
+        </details>
+    </section>
+
+    <section class="card">
+        <h2>Source</h2>
+        <p th:if="${r.sourceUrl != null and #strings.startsWith(r.sourceUrl, 'https://')}">
+            <a th:href="${r.sourceUrl}" target="_blank" rel="noopener noreferrer" th:text="${r.sourceUrl}">url</a>
+        </p>
+        <p th:if="${r.sourceUrl != null and !#strings.startsWith(r.sourceUrl, 'https://')}" class="refused">
+            Source is not an https link: <code th:text="${r.sourceUrl}">url</code>
+        </p>
+        <dl>
+            <dt>Authority</dt><dd th:text="${r.sourceAuthority} ?: '—'">—</dd>
+            <dt>In force from</dt><dd th:text="${r.effectiveFrom} ?: '—'">—</dd>
+            <dt>In force until</dt><dd th:text="${r.effectiveTo} ?: 'still in force'">—</dd>
+            <dt>Last verified</dt><dd th:text="${r.lastVerifiedAt} ?: '—'">—</dd>
+            <dt>Signed by</dt><dd th:text="${r.verifiedBy} ?: '—'">—</dd>
+            <dt>Re-check window</dt><dd th:text="${r.window}">ANNUAL</dd>
+        </dl>
+        <p th:if="${r.note}" class="note" th:text="${r.note}">note</p>
+    </section>
+
+    <section class="card actions">
+        <h2>Decision</h2>
+
+        <form th:if="${view.approveAllowed}" th:action="@{/review/{k}/{id}/approve(k=${r.kind.path}, id=${r.id})}"
+              method="post" class="stack">
+            <input type="hidden" name="version" th:value="${r.version}">
+            <label class="check">
+                <input type="checkbox" name="confirmed" value="true" required>
+                I opened the source document and every part of this record matches it: the value, who it
+                applies to, and the dates.
+            </label>
+            <button type="submit" class="primary">Verify and sign</button>
+        </form>
+        <p th:unless="${view.approveAllowed}" class="muted" th:text="${view.approveRefusal}">why not</p>
+
+        <form th:if="${view.canReturn}" th:action="@{/review/{k}/{id}/return(k=${r.kind.path}, id=${r.id})}"
+              method="post" class="stack">
+            <input type="hidden" name="version" th:value="${r.version}">
+            <label>What is wrong <textarea name="note" rows="3" maxlength="1000" required></textarea></label>
+            <button type="submit">Return for correction</button>
+        </form>
+
+        <form th:if="${view.canWithdraw}" th:action="@{/review/{k}/{id}/withdraw(k=${r.kind.path}, id=${r.id})}"
+              method="post" class="stack">
+            <input type="hidden" name="version" th:value="${r.version}">
+            <label>Why it is being withdrawn <textarea name="note" rows="3" maxlength="1000" required></textarea></label>
+            <button type="submit">Withdraw from students' phones</button>
+        </form>
+    </section>
+
+    <section th:unless="${view.careerNotes.isEmpty()}" class="card">
+        <details>
+            <summary>Career notes (internal)</summary>
+            <ul>
+                <li th:each="n : ${view.careerNotes}" th:text="${n}">note</li>
+            </ul>
+        </details>
+    </section>
+</main>
+</body>
+</html>

@@ -27,6 +27,18 @@ public sealed interface Requirement {
         val latest: LocalDate,
     ) : Requirement
 
+    /**
+     * A minimum age with no upper limit, written as a latest birth date for one exam cycle.
+     * NEET (UG) is the case: 17 by 31 December of the exam year, and no upper age limit.
+     * A BornBetween with an invented earliest date would put a number in front of a student
+     * that no source states.
+     */
+    @Serializable
+    @SerialName("born_on_or_before")
+    public data class BornOnOrBefore(
+        val latest: LocalDate,
+    ) : Requirement
+
     @Serializable
     @SerialName("body_metric")
     public data class BodyMetric(
@@ -101,6 +113,13 @@ public sealed interface Requirement {
     public data class SubjectsTaken(
         val subjects: Set<Subject>,
         val atStage: SchoolStage,
+        /**
+         * True when the rule lets missing subjects be studied after the stage — NMC's
+         * NEP-era position for NEET (UG) is that Physics, Chemistry, Biology and English may
+         * be passed as additional subjects even after class 12. Then a missing subject is a
+         * risk, never a closed door.
+         */
+        val addableAfterwards: Boolean = false,
     ) : Requirement
 
     @Serializable

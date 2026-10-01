@@ -32,6 +32,7 @@ public data class Milestone(
     val provenance: Provenance,
     val appliesTo: Applicability = Applicability.Everyone,
     val window: VerificationWindow = VerificationWindow.ANNUAL,
+    val necessity: Necessity = Necessity.REQUIRED,
 ) {
     init {
         require(review != ReviewState.KNOWN_UNSOURCED) {
@@ -40,6 +41,22 @@ public data class Milestone(
     }
 
     public fun isStale(asOf: LocalDate): Boolean = provenance.isStale(asOf, window)
+}
+
+/**
+ * Whether a step is a rule or a route.
+ *
+ * Medicine has rules: no NEET, no MBBS seat. Software engineering has none — no licence,
+ * no mandatory exam — only routes most people take. Presenting a common route as a rule
+ * would tell a student a door is closed when it is not; presenting a rule as a route would
+ * hide a gate. So every step says which it is, and the UI shows it.
+ */
+@Serializable
+public enum class Necessity {
+    REQUIRED,
+
+    /** A common route, not a rule. Other routes exist and are not wrong. */
+    TYPICAL,
 }
 
 @Serializable

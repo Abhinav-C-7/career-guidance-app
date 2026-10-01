@@ -94,7 +94,7 @@ Android-only, native. No iOS, no cross-platform layer.
 | AI | **Not in the MVP.** Behind one interface (`:ai`) when it lands, provider swapped by config — Gemini free tier while building | The pathway is deterministic. The model only ever explains what retrieval already returned |
 | Analytics | PostHog (EU or India region) | Student data minimisation |
 | Payments (later) | Razorpay | UPI-first |
-| Content authoring | Today: JSON in `content/careers/`, published by `tools/publish`. Later: the content service's review screen | Content must be diffable and reviewable, and signed by a person |
+| Content authoring | Values: JSON in `content/careers/`, published by `tools/publish`. Sign-off: the content service's review screen | Values are diffable in PRs; signatures are a person's act, recorded in the database |
 
 Target device is a low-end Android phone on a slow connection. Keep the APK small, budget
 for cold starts, test on a throttled network at 360dp.
@@ -122,6 +122,14 @@ Official sites → content service (Spring Boot, Railway) → human approves →
   a VERIFIED row signed by automation (`verified_requires_a_human`).
 - The schema is owned by `supabase/migrations` and the Supabase CLI. The content service
   must not run Flyway/Liquibase or `ddl-auto` against it.
+- **The database is the record of review.** The repo holds values; the review screen
+  (`content-service`, Spring Boot) holds signatures. `tools/publish` never overwrites a row a
+  person has signed or returned unless the repo changes its value — and then the old
+  signature is void, because it was for a value that no longer exists.
+- The content service connects as the `content_service` role, which can change review
+  state, signature, date and note — **never a value**. Column grants enforce it.
+- `FOREWAY_SERVER_ONLY=true` leaves the Android modules out of the Gradle build, so the
+  server image builds without the Android SDK.
 - The secret key lives only in Railway's environment and a local, gitignored `.env`. Never in
   the app, never in the repo. The app ships only the publishable (anon) key; RLS is the
   boundary.

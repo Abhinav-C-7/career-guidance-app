@@ -23,6 +23,11 @@ internal data class CareerRow(
     val title: String,
     val family: String,
     @SerialName("updated_at") val updatedAt: String,
+    @SerialName("parent_id") val parentId: String? = null,
+    val summary: String? = null,
+    // Defaults to regulated: if an older server omits the column, treat steps as the rules
+    // they are labelled as, never the reverse.
+    val regulated: Boolean = true,
 )
 
 @Serializable

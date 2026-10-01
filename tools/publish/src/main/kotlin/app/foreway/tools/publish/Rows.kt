@@ -5,6 +5,7 @@ import app.foreway.domain.model.CareerContent
 import app.foreway.domain.model.Criterion
 import app.foreway.domain.model.LookupPointer
 import app.foreway.domain.model.Milestone
+import app.foreway.domain.model.Necessity
 import app.foreway.domain.model.Requirement
 import app.foreway.domain.model.Timing
 import kotlinx.serialization.json.Json
@@ -34,7 +35,7 @@ internal object Rows {
         "last_verified_at", "verified_by", "look_up_at", "applies_to",
     )
 
-    val careerColumns: List<String> = listOf("id", "title", "family", "notes")
+    val careerColumns: List<String> = listOf("id", "title", "family", "notes", "parent_id", "summary", "regulated")
 
     val milestoneColumns: List<String> = listOf(
         "id", "career_id", "position", "review", "verification_window", "body",
@@ -47,6 +48,9 @@ internal object Rows {
         put("title", JsonPrimitive(content.title))
         put("family", JsonPrimitive(content.family.name))
         put("notes", json.encodeToJsonElement(serializer<List<String>>(), content.notes))
+        put("parent_id", content.parentId.orNull())
+        put("summary", content.summary.orNull())
+        put("regulated", JsonPrimitive(content.regulated))
     }
 
     fun criterion(careerId: String, c: Criterion): JsonObject {
@@ -93,6 +97,9 @@ internal object Rows {
                 put("kind", JsonPrimitive(m.kind.name))
                 put("timing", json.encodeToJsonElement(serializer<Timing>(), m.timing))
                 put("gates", json.encodeToJsonElement(serializer<List<String>>(), m.gates))
+                // Written only when it differs from the default, so a REQUIRED step stays
+                // readable by app builds from before necessity existed.
+                if (m.necessity != Necessity.REQUIRED) put("necessity", JsonPrimitive(m.necessity.name))
             },
         )
         put("source_url", JsonPrimitive(m.provenance.sourceUrl))

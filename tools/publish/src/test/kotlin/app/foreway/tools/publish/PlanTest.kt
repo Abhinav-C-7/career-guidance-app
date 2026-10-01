@@ -54,20 +54,6 @@ class PlanTest {
     }
 
     @Test
-    fun `a demotion is written and reported as leaving student view`() {
-        val server = rowsOf(nda).map {
-            if (it["id"] == JsonPrimitive("nda-nationality")) {
-                JsonObject(it + ("review" to JsonPrimitive("VERIFIED")) + ("verified_by" to JsonPrimitive("a-reviewer")))
-            } else {
-                it
-            }
-        }
-        val plan = plan(listOf(nda), listOf(Rows.career(nda)), server)
-        assertEquals(listOf("nda-nationality"), plan.criteria.upserts.map { (it["id"] as JsonPrimitive).content })
-        assertEquals(listOf("nda-nationality"), plan.criteria.leavingVisible)
-    }
-
-    @Test
     fun `a criterion removed from the repo is planned for deletion`() {
         val orphan = JsonObject(rowsOf(nda).first() + ("id" to JsonPrimitive("nda-retired-rule")))
         val plan = plan(listOf(nda), listOf(Rows.career(nda)), rowsOf(nda) + orphan)
@@ -109,5 +95,75 @@ class PlanTest {
             milestones = nda.milestones.mapIndexed { i, m -> if (i == 0) m.copy(review = ReviewState.VERIFIED) else m },
         )
         assertFailsWith<ContentRejected> { validate(mapOf("nda-officer-entry.json" to selfSigned)) }
+    }
+
+    private fun signedOnServer(id: String, review: String = "VERIFIED") = rowsOf(nda).map {
+        if (it["id"] == JsonPrimitive(id)) {
+            JsonObject(it + ("review" to JsonPrimitive(review)) + ("verified_by" to JsonPrimitive("Abhinav C")))
+        } else {
+            it
+        }
+    }
+
+    @Test
+    fun `a review done on the server is not undone by the unreviewed repo copy`() {
+        val plan = plan(listOf(nda), listOf(Rows.career(nda)), signedOnServer("nda-nationality"), stepsOf(nda))
+        assertTrue(plan.criteria.upserts.none { it["id"] == JsonPrimitive("nda-nationality") })
+        assertEquals(listOf("nda-nationality"), plan.criteria.keptAsReviewed)
+        assertTrue(plan.criteria.leavingVisible.isEmpty(), "a kept review must stay visible")
+    }
+
+    @Test
+    fun `a row a reviewer returned with a note is also kept`() {
+        val server = rowsOf(nda).map {
+            if (it["id"] == JsonPrimitive("nda-nationality")) {
+                JsonObject(it + ("review" to JsonPrimitive("DRAFT")) + ("review_note" to JsonPrimitive("wrong year")))
+            } else {
+                it
+            }
+        }
+        val plan = plan(listOf(nda), listOf(Rows.career(nda)), server, stepsOf(nda))
+        assertEquals(listOf("nda-nationality"), plan.criteria.keptAsReviewed)
+    }
+
+    @Test
+    fun `changing a value in the repo goes through and voids the old signature`() {
+        val edited = nda.copy(criteria = nda.criteria.map { if (it.id == "nda-nationality") it.copy(label = "Nationality (edited)") else it })
+        val plan = plan(listOf(edited), listOf(Rows.career(edited)), signedOnServer("nda-nationality"), stepsOf(edited))
+        val upsert = plan.criteria.upserts.single { it["id"] == JsonPrimitive("nda-nationality") }
+        assertEquals(JsonPrimitive("NEEDS_REVIEW"), upsert["review"])
+        assertEquals(kotlinx.serialization.json.JsonNull, upsert["review_note"])
+        assertEquals(listOf("nda-nationality"), plan.criteria.leavingVisible)
+    }
+
+    private fun load(name: String) = ContentLoader.parse(File("../../content/careers/$name.json").readText())
+
+    @Test
+    fun `parents are written before their children`() {
+        val tree = listOf("neurosurgeon", "surgeon-general-surgery", "doctor-mbbs", "specialist-md-ms").map(::load)
+        val order = plan(tree, emptyList(), emptyList()).careerUpserts.map { (it["id"] as JsonPrimitive).content }
+        assertEquals(listOf("doctor-mbbs", "specialist-md-ms", "surgeon-general-surgery", "neurosurgeon"), order)
+    }
+
+    @Test
+    fun `a specialisation published without its parent is refused`() {
+        val orphan = load("neurosurgeon")
+        assertFailsWith<ContentRejected> { validate(mapOf("neurosurgeon.json" to orphan)) }
+    }
+
+    @Test
+    fun `an unregulated career cannot carry a rule`() {
+        val se = load("software-engineer")
+        val ruled = se.copy(milestones = se.milestones.map { it.copy(necessity = app.foreway.domain.model.Necessity.REQUIRED) })
+        assertFailsWith<ContentRejected> { validate(mapOf("software-engineer.json" to ruled)) }
+    }
+
+    @Test
+    fun `a common-route step says so, a required step stays readable by older builds`() {
+        val se = load("software-engineer")
+        val body = Rows.milestone(se.careerId, 1, se.milestones.first())["body"] as JsonObject
+        assertEquals(JsonPrimitive("TYPICAL"), body["necessity"])
+        val ndaBody = Rows.milestone(nda.careerId, 1, nda.milestones.first())["body"] as JsonObject
+        assertTrue("necessity" !in ndaBody)
     }
 }

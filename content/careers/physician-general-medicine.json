@@ -1,0 +1,34 @@
+{
+  "careerId": "physician-general-medicine",
+  "title": "Physician (MD General Medicine)",
+  "family": "MEDICAL",
+  "parentId": "specialist-md-ms",
+  "summary": "Diagnoses and treats adult illness without surgery, and is the gateway to the medical super-specialties.",
+  "notes": [
+    "NOTHING here is VERIFIED. Extracted by an automated pass on 2026-10-02 from the primary documents named below; a person must check each value against the cited page and sign it in the review screen.",
+    "SOURCES: NBEMS Information Bulletin NEET-SS 2025 (SHA-256 f09b6a60dea2f628b27504a033b43c1c96fa2a179d917acff4bd6682c57e8732).",
+    "Evidence page, NEET-SS 2025 p.19: the medical group's feeder qualification is MD/DNB General Medicine, and the group covers cardiology, clinical haematology, endocrinology, nephrology, neurology and others."
+  ],
+  "criteria": [],
+  "milestones": [
+    {
+      "id": "md-step-general-medicine",
+      "title": "MD (or DNB) in General Medicine",
+      "detail": "Choose General Medicine when you are allotted a postgraduate seat. NEET-SS accepts it for the medical super-specialties, including cardiology, neurology and nephrology.",
+      "kind": "TRAINING",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://nbe.edu.in/IB/NEET-SS%202025%20information%20bulletin.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2025-11-05",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    }
+  ]
+}

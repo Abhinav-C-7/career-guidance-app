@@ -68,7 +68,9 @@ class OnboardingViewModel(
     init {
         // Careers can arrive mid-onboarding if the first sync finishes while they type.
         viewModelScope.launch {
-            content.careers().collect { list -> _state.update { it.copy(careers = list) } }
+            // Top level only. Onboarding asks the broad question; home offers the
+            // specialisations once a student has a goal to go further from.
+            content.careers().collect { list -> _state.update { it.copy(careers = list.filter { c -> c.parentId == null }) } }
         }
     }
 

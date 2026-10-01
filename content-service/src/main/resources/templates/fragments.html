@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title th:text="${title} + ' · Foreway review'">Foreway review</title>
+    <link rel="stylesheet" th:href="@{/css/review.css}">
+</head>
+<body>
+<header th:fragment="header" class="bar">
+    <a th:href="@{/}" class="brand">Foreway review</a>
+    <form th:action="@{/logout}" method="post" class="inline">
+        <button type="submit" class="link">Sign out</button>
+    </form>
+</header>
+</body>
+</html>

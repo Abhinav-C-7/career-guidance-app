@@ -62,6 +62,9 @@ private fun RiskReason.describe(): String = when (this) {
     is RiskReason.SubjectsStillAhead ->
         stringResource(R.string.risk_subjects_ahead, missing.readable())
 
+    is RiskReason.SubjectsCanStillBeAdded ->
+        stringResource(R.string.risk_subjects_addable, missing.readable())
+
     is RiskReason.StageStillAhead -> stringResource(R.string.risk_stage_ahead)
 
     is RiskReason.StageNotYetPassed -> stringResource(R.string.risk_stage_not_passed)

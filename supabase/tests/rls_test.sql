@@ -262,4 +262,60 @@ exception
         null; -- expected
 end $$;
 
+-- --------------------------------------------------------------------------
+-- The review service can sign and return records, and nothing else.
+-- --------------------------------------------------------------------------
+
+set local role content_service;
+
+do $$
+declare
+    n int;
+begin
+    select count(*) into n from criteria where career_id = 'rls-test' and review in ('DRAFT', 'NEEDS_REVIEW');
+    if n = 0 then
+        raise exception 'content_service cannot see the review queue';
+    end if;
+end $$;
+
+do $$
+declare
+    n int;
+begin
+    update criteria set review = 'DRAFT', review_note = 'returned in test' where id = 'rls-needs-review';
+    get diagnostics n = row_count;
+    if n <> 1 then
+        raise exception 'content_service could not return a criterion for correction';
+    end if;
+end $$;
+
+do $$
+begin
+    update criteria set requirement = '{"type":"attempt_limit","maxAttempts":9}'::jsonb where id = 'rls-verified';
+    raise exception 'content_service was able to change an eligibility value';
+exception
+    when insufficient_privilege then
+        null; -- expected: no UPDATE grant on requirement
+end $$;
+
+do $$
+begin
+    update milestones set body = '{}'::jsonb where id = 'rls-step-verified';
+    raise exception 'content_service was able to change a step';
+exception
+    when insufficient_privilege then
+        null; -- expected
+end $$;
+
+do $$
+begin
+    delete from criteria where id = 'rls-draft';
+    raise exception 'content_service was able to delete a criterion';
+exception
+    when insufficient_privilege then
+        null; -- expected
+end $$;
+
+reset role;
+
 rollback;

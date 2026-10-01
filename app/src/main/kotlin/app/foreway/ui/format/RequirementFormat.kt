@@ -17,6 +17,8 @@ fun Requirement.displayValue(): String = when (this) {
     is Requirement.BornBetween ->
         "${earliest.shortDate()} – ${latest.shortDate()}"
 
+    is Requirement.BornOnOrBefore -> "Born on or before ${latest.shortDate()}"
+
     is Requirement.BodyMetric -> {
         val unit = if (metric == BodyMetricKind.WEIGHT_KG) "kg" else "cm"
         // Local copies: properties from another module cannot be smart-cast.

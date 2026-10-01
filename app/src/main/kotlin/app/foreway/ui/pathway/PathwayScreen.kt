@@ -39,12 +39,14 @@ import app.foreway.R
 import app.foreway.domain.engine.PathwayStep
 import app.foreway.domain.engine.Position
 import app.foreway.domain.model.AssessedCriterion
+import app.foreway.domain.model.Necessity
 import app.foreway.domain.model.SchoolClass
 import app.foreway.domain.model.Timing
 import app.foreway.ui.components.CriterionRow
 import app.foreway.ui.components.Gutter
 import app.foreway.ui.components.SourceLine
-import app.foreway.ui.components.TextAction
+import app.foreway.ui.components.BackAction
+import app.foreway.ui.components.UnregulatedNote
 import app.foreway.ui.format.familyLabel
 import app.foreway.ui.theme.ForewayColors
 import app.foreway.ui.theme.ForewayTheme
@@ -81,7 +83,7 @@ fun PathwayContent(state: PathwayUiState, onBack: () -> Unit) {
                 .windowInsetsPadding(WindowInsets.navigationBars)
                 .padding(bottom = 32.dp),
         ) {
-            TextAction(stringResource(R.string.pathway_back), onBack, Modifier.padding(horizontal = 16.dp))
+            BackAction(stringResource(R.string.pathway_back), onBack, Modifier.padding(horizontal = 16.dp))
             when (state) {
                 PathwayUiState.Loading -> Unit
                 PathwayUiState.NotDownloaded -> Padded {
@@ -111,6 +113,18 @@ private fun Ready(state: PathwayUiState.Ready) {
         Text(state.career.title, style = ForewayTypography.headlineLarge, color = ForewayColors.Ink)
         Spacer(Modifier.height(8.dp))
         Text(stringResource(R.string.pathway_intro), style = ForewayTypography.bodyLarge, color = ForewayColors.InkMuted)
+        if (state.buildsOn.isNotEmpty()) {
+            Spacer(Modifier.height(8.dp))
+            Text(
+                stringResource(R.string.pathway_builds_on, state.buildsOn.joinToString(" → ") { it.title }),
+                style = ForewayTypography.labelSmall,
+                color = ForewayColors.InkMuted,
+            )
+        }
+        if (!state.career.regulated) {
+            Spacer(Modifier.height(16.dp))
+            UnregulatedNote()
+        }
         Spacer(Modifier.height(24.dp))
     }
 
@@ -188,6 +202,14 @@ private fun StepNode(step: PathwayStep, isFirst: Boolean, isLast: Boolean) {
                 style = ForewayTypography.titleLarge,
                 color = if (step.position == Position.PAST) ForewayColors.InkMuted else ForewayColors.Ink,
             )
+            if (m.necessity == Necessity.TYPICAL) {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    stringResource(R.string.pathway_common_route),
+                    style = ForewayTypography.labelSmall,
+                    color = ForewayColors.InkMuted,
+                )
+            }
             m.detail?.let {
                 Spacer(Modifier.height(6.dp))
                 Text(it, style = ForewayTypography.bodyLarge, color = ForewayColors.InkMuted)

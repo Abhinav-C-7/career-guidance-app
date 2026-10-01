@@ -1,0 +1,54 @@
+{
+  "careerId": "cardiologist",
+  "title": "Cardiologist (DM)",
+  "family": "MEDICAL",
+  "parentId": "physician-general-medicine",
+  "summary": "Diagnoses and treats diseases of the heart.",
+  "notes": [
+    "NOTHING here is VERIFIED. Extracted by an automated pass on 2026-10-02 from the primary documents named below; a person must check each value against the cited page and sign it in the review screen.",
+    "SOURCES: NBEMS Information Bulletin NEET-SS 2025 (SHA-256 f09b6a60dea2f628b27504a033b43c1c96fa2a179d917acff4bd6682c57e8732).",
+    "Evidence pages, NEET-SS 2025: cardiology in the medical group, feeder MD/DNB General Medicine p.19; eligibility and cut-off 31.01.2026, registration mandatory p.62.",
+    "CHECK on review: older NEET-SS bulletins accepted further feeder degrees for DM Cardiology. Confirm against Annexure-A of the current bulletin that General Medicine is the only one before signing."
+  ],
+  "criteria": [],
+  "milestones": [
+    {
+      "id": "dm-step-neetss",
+      "title": "Sit NEET-SS in the medical group",
+      "detail": "Cardiology is in the medical group, open to those holding MD or DNB in General Medicine by the cut-off date (31 January 2026 for NEET-SS 2025). Registration with the NMC or a State Medical Council is mandatory.",
+      "kind": "ENTRANCE_EXAM",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://nbe.edu.in/IB/NEET-SS%202025%20information%20bulletin.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2025-11-05",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    },
+    {
+      "id": "dm-step-cardiology",
+      "title": "DM in Cardiology",
+      "detail": "The super-specialty degree in cardiology, allotted through NEET-SS counselling.",
+      "kind": "TRAINING",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://nbe.edu.in/IB/NEET-SS%202025%20information%20bulletin.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2025-11-05",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    }
+  ]
+}

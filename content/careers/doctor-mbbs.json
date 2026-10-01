@@ -1,0 +1,146 @@
+{
+  "careerId": "doctor-mbbs",
+  "title": "Doctor (MBBS)",
+  "family": "MEDICAL",
+  "summary": "Diagnoses and treats patients. The MBBS degree is the foundation every medical specialisation builds on.",
+  "notes": [
+    "NOTHING here is VERIFIED. Extracted by an automated pass on 2026-10-02 from the primary documents named below; a person must check each value against the cited page and sign it in the review screen.",
+    "SOURCES: NTA Information Bulletin NEET (UG)-2026 (SHA-256 2b688f32bc58e5d5acdc4d61c8e6795a81419c40887a7e5c40b7d163174b4925); NBEMS Information Bulletin NEET-PG 2025 (SHA-256 bbf1c02f3e32986f2bdfd258786290f485f14150a07df528b3c9b74b9a301237).",
+    "Evidence pages, NEET (UG) 2026: application window 08.02.2026 p.7; age 17 by 31 December of the NEET year and no upper age limit p.30; appearing in class 12 allowed, and PCB + English may be passed as additional subjects after class 12 (NMC Public Notice 22.11.2023) p.31; exam pattern 180 questions, 720 marks, +4/-1 p.26; qualifying percentile 50th / 40th (SC, ST, OBC) / 45th (PwBD unreserved) p.44; counselling, MCC for 15% All India Quota, AIIMS, JIPMER, central and deemed universities p.30. NEET-PG 2025 p.70: one-year internship and NMC/State Medical Council registration.",
+    "DELIBERATELY ABSENT: the '50% in Physics, Chemistry and Biology in class 12' rule that coaching sites repeat. It does not appear in the NEET (UG) 2026 bulletin. If a later NMC regulation restores it, add it with that source.",
+    "CHECK on review: p.30's age table prints 'born on or before 31.12.2009' for General/EWS; the SC/ST/OBC/PwBD column was not extractable as text. Confirm it is the same date before signing.",
+    "MODEL GAP: the qualifying percentile depends on category, which the profile does not hold, so it lives in step text rather than as a criterion. Course length of MBBS is not stated in these documents and is deliberately not given."
+  ],
+  "criteria": [
+    {
+      "id": "mbbs-neet-age-2026",
+      "label": "Minimum age for NEET (UG) 2026",
+      "review": "NEEDS_REVIEW",
+      "window": "VOLATILE",
+      "requirement": {
+        "value": {
+          "type": "born_on_or_before",
+          "latest": "2009-12-31"
+        },
+        "provenance": {
+          "sourceUrl": "https://cdnbbsr.s3waas.gov.in/s37bc1ec1d9c3426357e69acd5bf320061/uploads/2026/02/202602231394640855.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2026-02-08",
+          "lastVerifiedAt": "2026-10-02",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      }
+    },
+    {
+      "id": "mbbs-subjects",
+      "label": "Physics, Chemistry, Biology and English passed",
+      "review": "NEEDS_REVIEW",
+      "window": "ANNUAL",
+      "requirement": {
+        "value": {
+          "type": "subjects_taken",
+          "subjects": [
+            "PHYSICS",
+            "CHEMISTRY",
+            "BIOLOGY",
+            "ENGLISH"
+          ],
+          "atStage": "CLASS_12",
+          "addableAfterwards": true
+        },
+        "provenance": {
+          "sourceUrl": "https://cdnbbsr.s3waas.gov.in/s37bc1ec1d9c3426357e69acd5bf320061/uploads/2026/02/202602231394640855.pdf",
+          "authority": "OFFICIAL_NOTIFICATION",
+          "effectiveFrom": "2026-02-08",
+          "lastVerifiedAt": "2026-10-02",
+          "verifiedBy": "automated-extraction-unreviewed"
+        }
+      }
+    }
+  ],
+  "milestones": [
+    {
+      "id": "mbbs-step-subjects",
+      "title": "Physics, Chemistry, Biology and English in class 11 and 12",
+      "detail": "Biotechnology can stand in for Biology. Under NMC's 2023 decision these subjects can also be passed as additional subjects after class 12 from a recognised board, so another stream does not close medicine for good.",
+      "kind": "SUBJECT_CHOICE",
+      "timing": {
+        "type": "school_years",
+        "from": "CLASS_11",
+        "to": "CLASS_12"
+      },
+      "gates": [
+        "mbbs-subjects"
+      ],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://cdnbbsr.s3waas.gov.in/s37bc1ec1d9c3426357e69acd5bf320061/uploads/2026/02/202602231394640855.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2026-02-08",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    },
+    {
+      "id": "mbbs-step-neet",
+      "title": "Sit NEET (UG)",
+      "detail": "You can sit it while appearing in class 12, but you must pass class 12 before the first round of counselling. One paper of 180 questions for 720 marks: Physics 180, Chemistry 180, Biology 360. A correct answer earns 4 marks and a wrong one loses 1. There is no upper age limit.",
+      "kind": "ENTRANCE_EXAM",
+      "timing": {
+        "type": "from_stage",
+        "stage": "CLASS_12"
+      },
+      "gates": [
+        "mbbs-neet-age-2026"
+      ],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://cdnbbsr.s3waas.gov.in/s37bc1ec1d9c3426357e69acd5bf320061/uploads/2026/02/202602231394640855.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2026-02-08",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    },
+    {
+      "id": "mbbs-step-counselling",
+      "title": "Qualify, then win a seat through counselling",
+      "detail": "An MBBS seat needs at least the 50th percentile in NEET (40th for SC, ST and OBC candidates; 45th for unreserved PwBD candidates). The MCC allots the 15% All India Quota and seats at AIIMS, JIPMER, central and deemed universities; each state's counselling authority allots the rest.",
+      "kind": "APPLICATION",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://cdnbbsr.s3waas.gov.in/s37bc1ec1d9c3426357e69acd5bf320061/uploads/2026/02/202602231394640855.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2026-02-08",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    },
+    {
+      "id": "mbbs-step-degree",
+      "title": "MBBS, ending in a one-year internship",
+      "detail": "After the degree comes a compulsory one-year internship, and registration with the NMC or a State Medical Council. Both are what NEET-PG asks for if you go on to specialise.",
+      "kind": "TRAINING",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://nbe.edu.in/IB/IB%20NEET-PG%202025.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2025-04-17",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL"
+    }
+  ]
+}

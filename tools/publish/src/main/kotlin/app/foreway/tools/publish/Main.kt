@@ -58,8 +58,9 @@ private fun run(dir: File, apply: Boolean, allowDelete: Boolean) {
     val api = Rest.fromEnvironment()
     val careerIds = content.values.map { it.careerId }
     val existingCareers = api.select("careers", Rows.careerColumns, "id", careerIds)
-    val existingCriteria = api.select("criteria", Rows.criterionColumns, "career_id", careerIds)
-    val existingMilestones = api.select("milestones", Rows.milestoneColumns, "career_id", careerIds)
+    // review_note is read so a row a reviewer has returned is recognised as reviewed.
+    val existingCriteria = api.select("criteria", Rows.criterionColumns + "review_note", "career_id", careerIds)
+    val existingMilestones = api.select("milestones", Rows.milestoneColumns + "review_note", "career_id", careerIds)
 
     val plan = plan(content.values, existingCareers, existingCriteria, existingMilestones)
     report(plan)
@@ -106,6 +107,10 @@ private fun report(name: String, t: TableChanges) {
     println("$name to write:  ${t.upserts.size}")
     println("$name to delete: ${t.deletions.size}")
     t.deletions.forEach { println("  - $it") }
+    if (t.keptAsReviewed.isNotEmpty()) {
+        println("$name kept as reviewed on the server (${t.keptAsReviewed.size}):")
+        t.keptAsReviewed.forEach { println("  = $it") }
+    }
 
     // The only lines that change what a student sees. Read these every time.
     println("Students WILL START seeing (${t.becomingVisible.size}):")

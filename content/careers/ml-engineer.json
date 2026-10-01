@@ -1,0 +1,37 @@
+{
+  "careerId": "ml-engineer",
+  "title": "Machine learning engineer",
+  "family": "ENGINEERING",
+  "parentId": "software-engineer",
+  "regulated": false,
+  "summary": "Builds software that learns from data: recommendations, language, vision.",
+  "notes": [
+    "NOTHING here is VERIFIED. Extracted by an automated pass on 2026-10-02 from the primary documents named below; a person must check each value against the cited page and sign it in the review screen.",
+    "SOURCES: AICTE Model Curriculum, UG CSE (AI & ML) (2021) (SHA-256 20f1158dc55aff0ed53ba98649a0546015f179c9dc4e9a42e5640d894bc7773a).",
+    "Evidence page, AICTE CSE (AI & ML) model curriculum (2021) p.18: core courses include Artificial Intelligence, Deep Learning, Natural Language Processing, Advanced Machine Learning, Optimization Techniques in Machine Learning, Data and Visual Analytics in AI.",
+    "UNREGULATED: the step is TYPICAL. Adding these subjects to a regular CSE degree is equally valid; the specialised B.Tech is one way to do it."
+  ],
+  "criteria": [],
+  "milestones": [
+    {
+      "id": "ml-step-specialise",
+      "title": "Specialise in AI and machine learning",
+      "detail": "Take B.Tech CSE (AI & ML), or add the same subjects to a CSE degree. AICTE's AI & ML curriculum covers artificial intelligence, deep learning, natural language processing, advanced machine learning, and optimisation for machine learning.",
+      "kind": "TRAINING",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://www.aicte.gov.in/sites/default/files/CS%20(AI&ML).pdf",
+        "authority": "GOVERNMENT_RELEASE",
+        "effectiveFrom": "2021-01-01",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "SLOW",
+      "necessity": "TYPICAL"
+    }
+  ]
+}

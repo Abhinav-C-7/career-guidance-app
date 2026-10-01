@@ -90,6 +90,9 @@ public sealed interface RiskReason {
 
     public data class SubjectsStillAhead(val missing: Set<Subject>) : RiskReason
 
+    /** Not taken, but the rule allows passing them later as additional subjects. */
+    public data class SubjectsCanStillBeAdded(val missing: Set<Subject>) : RiskReason
+
     public data class StageStillAhead(val stage: SchoolStage) : RiskReason
 
     public data class StageNotYetPassed(val stage: SchoolStage) : RiskReason

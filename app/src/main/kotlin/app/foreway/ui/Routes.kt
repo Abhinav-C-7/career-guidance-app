@@ -12,3 +12,7 @@ data object HomeRoute
 
 @Serializable
 data class PathwayRoute(val careerId: String)
+
+/** The career browser: all fields when [careerId] is null, else one career and its specialisations. */
+@Serializable
+data class CareerRoute(val careerId: String? = null)

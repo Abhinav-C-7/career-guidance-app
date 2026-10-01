@@ -1,0 +1,37 @@
+{
+  "careerId": "security-engineer",
+  "title": "Cybersecurity engineer",
+  "family": "ENGINEERING",
+  "parentId": "software-engineer",
+  "regulated": false,
+  "summary": "Protects systems and data from attack.",
+  "notes": [
+    "NOTHING here is VERIFIED. Extracted by an automated pass on 2026-10-02 from the primary documents named below; a person must check each value against the cited page and sign it in the review screen.",
+    "SOURCES: AICTE Model Curriculum, Minor Degree in Cyber Security (2020) (SHA-256 ffb655b70e891f414e182fcfdb316417004baf2c7d9b8d7e59185065f3fc14e3).",
+    "Evidence pages, AICTE Minor Degree model curriculum (2020): a minor degree carries 18 to 20 credits in addition to the major degree, cyber security is one of seven p.3; cryptography and information-theoretic security topics p.11.",
+    "UNREGULATED: the step is TYPICAL."
+  ],
+  "criteria": [],
+  "milestones": [
+    {
+      "id": "sec-step-minor",
+      "title": "Add a minor degree in cyber security",
+      "detail": "AICTE's minor degree in cyber security adds 18 to 20 credits to a regular engineering degree, covering topics such as cryptography and information-theoretic security.",
+      "kind": "TRAINING",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://www.aicte.gov.in/downloads/msyllabus/Minor/Cyber%20Security%20Minor%20Degree.pdf",
+        "authority": "GOVERNMENT_RELEASE",
+        "effectiveFrom": "2020-01-01",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "SLOW",
+      "necessity": "TYPICAL"
+    }
+  ]
+}

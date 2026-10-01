@@ -1,0 +1,80 @@
+{
+  "careerId": "software-engineer",
+  "title": "Software engineer",
+  "family": "ENGINEERING",
+  "regulated": false,
+  "summary": "Designs, builds and maintains software. Employers hire on skill: there is no licence and no mandatory exam.",
+  "notes": [
+    "NOTHING here is VERIFIED. Extracted by an automated pass on 2026-10-02 from the primary documents named below; a person must check each value against the cited page and sign it in the review screen.",
+    "SOURCES: NTA Information Bulletin JEE (Main) 2026 (SHA-256 b18d5d608dda0a274eaa1bcaa4127e0ab7e49d2fd0e78840bd9c96707400960e); AICTE Model Curriculum, UG Computer Science and Engineering (2022) (SHA-256 5c4bd3b16c2865fbbf1b37651e639f009676153247283c5cc44ba5a6341ed410).",
+    "UNREGULATED: every step is TYPICAL, a common route and not a rule. The B.Tech route through JEE Main is shown because it is the route with official, sourceable rules; other routes (BCA, B.Sc. Computer Science, self-taught) exist and are not wrong, but nothing official describes them, so they are not given as steps.",
+    "Evidence pages, JEE (Main) 2026: application window from 31.10.2025 p.8; Paper 1 covers Mathematics, Physics and Chemistry p.17; no age limit, class 12 passed in 2024 or 2025 or appearing in 2026 p.24; NIT+ admission 75% (65% SC, ST, PwD) or category top 20 percentile, subject combination for Paper 1 programmes, JoSAA/CSAB p.42.",
+    "Evidence pages, AICTE CSE model curriculum (2022): 163 credits over four years p.15; summer internships embedded p.7. AICTE states only the year, so effectiveFrom is 1 January of it — check on review."
+  ],
+  "criteria": [],
+  "milestones": [
+    {
+      "id": "se-step-subjects",
+      "title": "Physics and Maths in class 11 and 12, to keep the B.Tech route open",
+      "detail": "For B.E. or B.Tech admission through JEE Main at NITs, IIITs and other centrally funded institutes, class 12 must include Physics, Mathematics, a language, one of Chemistry, Biotechnology, Biology or a technical vocational subject, and one more subject.",
+      "kind": "SUBJECT_CHOICE",
+      "timing": {
+        "type": "school_years",
+        "from": "CLASS_11",
+        "to": "CLASS_12"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://cdnbbsr.s3waas.gov.in/s3f8e59f4b2fe7c5705bf878bbd494ccdf/uploads/2025/11/202511021649722475.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2025-10-31",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL",
+      "necessity": "TYPICAL"
+    },
+    {
+      "id": "se-step-jee",
+      "title": "JEE Main, for B.E. or B.Tech in Computer Science",
+      "detail": "There is no age limit; you can sit it in the year you pass class 12 and the two years after. Paper 1 covers Mathematics, Physics and Chemistry. NITs and IIITs also need 75% in class 12 (65% for SC, ST and PwD candidates) or a place in your board's top 20 percentile. Their seats are allotted through JoSAA and CSAB.",
+      "kind": "ENTRANCE_EXAM",
+      "timing": {
+        "type": "from_stage",
+        "stage": "CLASS_12"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://cdnbbsr.s3waas.gov.in/s3f8e59f4b2fe7c5705bf878bbd494ccdf/uploads/2025/11/202511021649722475.pdf",
+        "authority": "OFFICIAL_NOTIFICATION",
+        "effectiveFrom": "2025-10-31",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "ANNUAL",
+      "necessity": "TYPICAL"
+    },
+    {
+      "id": "se-step-degree",
+      "title": "A four-year B.Tech in Computer Science and Engineering",
+      "detail": "AICTE's model curriculum sets 163 credits over four years, with summer internships built in so students work on real industry problems.",
+      "kind": "TRAINING",
+      "timing": {
+        "type": "follows"
+      },
+      "gates": [],
+      "review": "NEEDS_REVIEW",
+      "provenance": {
+        "sourceUrl": "https://www.aicte.gov.in/sites/default/files/Updated-AICTE%20-%20UG%20CSE.pdf",
+        "authority": "GOVERNMENT_RELEASE",
+        "effectiveFrom": "2022-01-01",
+        "lastVerifiedAt": "2026-10-02",
+        "verifiedBy": "automated-extraction-unreviewed"
+      },
+      "window": "SLOW",
+      "necessity": "TYPICAL"
+    }
+  ]
+}

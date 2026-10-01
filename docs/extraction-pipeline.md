@@ -134,6 +134,14 @@ on the server are invisible to clients. Unchanged rows are skipped, because ever
 ./gradlew :tools:publish:run --args="--apply --allow-delete" # also delete removed criteria
 ```
 
+### Who signs
+
+A person, in the review screen (`content-service`), never a file edit and never a script.
+The screen decodes every record with the app's own model first, and refuses to let a
+record be signed if a phone could not read it. Each sign-off lands only if the row has not
+changed since the reviewer opened it. Returning a record needs a reason, and the reason is
+signed. `tools/publish` keeps any server-side review whose value the repo has not changed.
+
 ### What the app reads
 
 The client contract is `published_careers`, `published_criteria`, `published_milestones`,

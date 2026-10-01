@@ -23,6 +23,13 @@ dependencyResolutionManagement {
 rootProject.name = "foreway"
 
 include(":domain")
-include(":app")
-include(":data")
 include(":tools:publish")
+include(":content-service")
+
+// The server image is built without the Android SDK, and Android modules cannot even be
+// configured without one. FOREWAY_SERVER_ONLY=true (set in content-service/Dockerfile)
+// leaves them out; everywhere else they are part of the build as normal.
+if (System.getenv("FOREWAY_SERVER_ONLY") != "true") {
+    include(":app")
+    include(":data")
+}

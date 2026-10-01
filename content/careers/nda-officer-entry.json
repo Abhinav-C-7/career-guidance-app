@@ -2,6 +2,7 @@
   "careerId": "nda-officer-entry",
   "title": "Armed forces officer (NDA entry)",
   "family": "DEFENCE",
+  "summary": "Joins the Army, Navy or Air Force as an officer, entering straight after class 12.",
   "notes": [
     "NOTHING here is VERIFIED. Every criterion was extracted from a primary PDF by an automated pass and no person has checked it, so none of it renders to a student. Criteria at NEEDS_REVIEW need a named human to check the value against the cited source and set verifiedBy to their own name. Criteria at DRAFT are blocked by a modelling gap as well, and must not be moved past DRAFT until the gap named in the notes below is closed.",
     "Source of record: UPSC Examination Notice No. 10/2026-NDA-II, dated 20.05.2026, for the 158th NDA Course and 120th Indian Naval Academy Course commencing 1 July 2027.",

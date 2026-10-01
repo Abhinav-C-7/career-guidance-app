@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: foreway-content-service
+  config:
+    # Local runs read the gitignored .env at the repo root. On Railway there is no file;
+    # the same names come from the service's environment variables.
+    import: optional:file:.env[.properties]
+  datasource:
+    # Connect as content_service through the Supabase session pooler — never as postgres.
+    # Named explicitly: Spring maps SPRING_DATASOURCE_URL to spring.datasource.url only for
+    # real environment variables, not for keys read from the .env file, so without these
+    # placeholders a local run silently has no database configured.
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      maximum-pool-size: 3
+  thymeleaf:
+    cache: true
+
+server:
+  port: ${PORT:8080}
+  # Railway terminates TLS in front of us; trust its forwarded headers so redirects and
+  # secure cookies use https.
+  forward-headers-strategy: framework
+  servlet:
+    session:
+      timeout: 2h
+      cookie:
+        http-only: true
+        same-site: strict
+        secure: ${FOREWAY_SECURE_COOKIE:true}
+
+foreway:
+  reviewer:
+    name: ${FOREWAY_REVIEWER_NAME:}
+    password: ${FOREWAY_REVIEWER_PASSWORD:}

@@ -16,6 +16,11 @@ public data class CareerSummary(
     val title: String,
     /** Null when the server sent a family this build does not know. Render neutrally. */
     val family: CareerFamily?,
+    /** The broader career this specialises, or null for a top-level career. */
+    val parentId: String? = null,
+    val summary: String? = null,
+    /** False when no licence or mandatory exam exists; every step is then a common route. */
+    val regulated: Boolean = true,
 )
 
 public data class Steps(
@@ -36,24 +41,31 @@ public class ContentRepository internal constructor(private val dao: ContentDao)
                 id = row.id,
                 title = row.title,
                 family = CareerFamily.entries.firstOrNull { it.name == row.family },
+                parentId = row.parentId,
+                summary = row.summary,
+                regulated = row.regulated,
             )
         }
     }
 
     /**
-     * Every synced criterion for a career, including ones this build cannot read — those
-     * arrive as declared gaps (see RowMapper). Filtering by review state and applicability
-     * is GateEvaluator's job, not this one's.
+     * Every synced criterion for a career chain (Lineage: root first), including ones this
+     * build cannot read — those arrive as declared gaps (see RowMapper). Filtering by review
+     * state and applicability is GateEvaluator's job, not this one's.
      */
-    public fun criteriaFor(careerId: String): Flow<List<Criterion>> =
-        dao.criteriaFor(careerId).map { rows ->
+    public fun criteriaFor(chain: List<String>): Flow<List<Criterion>> =
+        dao.criteriaFor(chain).map { rows ->
             rows.map { RowMapper.criterion(json.decodeFromString(CriterionRow.serializer(), it.row)) }
         }
 
-    /** Every synced step for a career, in order. Filtering is PathwayBuilder's job. */
-    public fun milestonesFor(careerId: String): Flow<Steps> =
-        dao.milestonesFor(careerId).map { rows ->
-            val mapped = rows.map { RowMapper.milestone(json.decodeFromString(MilestoneRow.serializer(), it.row)) }
+    /**
+     * Every synced step for a career chain, in pathway order: the root career's steps first,
+     * each career's own steps in their published order. Filtering is PathwayBuilder's job.
+     */
+    public fun milestonesFor(chain: List<String>): Flow<Steps> =
+        dao.milestonesFor(chain).map { rows ->
+            val ordered = rows.sortedWith(compareBy({ chain.indexOf(it.careerId) }, { it.position }))
+            val mapped = ordered.map { RowMapper.milestone(json.decodeFromString(MilestoneRow.serializer(), it.row)) }
             Steps(milestones = mapped.filterNotNull(), unreadable = mapped.count { it == null })
         }
 }

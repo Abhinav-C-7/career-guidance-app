@@ -5,6 +5,7 @@ import app.foreway.domain.model.Criterion
 import app.foreway.domain.model.LookupPointer
 import app.foreway.domain.model.Milestone
 import app.foreway.domain.model.MilestoneKind
+import app.foreway.domain.model.Necessity
 import app.foreway.domain.model.Provenance
 import app.foreway.domain.model.Requirement
 import app.foreway.domain.model.ReviewState
@@ -125,6 +126,7 @@ internal object RowMapper {
                     strict.decodeFromJsonElement(Applicability.serializer(), it)
                 } ?: Applicability.Everyone,
                 window = VerificationWindow.valueOf(row.verificationWindow),
+                necessity = body.necessity,
             )
         } catch (_: Exception) {
             null
@@ -138,6 +140,7 @@ internal object RowMapper {
         val kind: MilestoneKind,
         val timing: Timing,
         val gates: List<String> = emptyList(),
+        val necessity: Necessity = Necessity.REQUIRED,
     )
 
     private fun JsonElement?.present(): JsonElement? = takeUnless { it == null || it is JsonNull }

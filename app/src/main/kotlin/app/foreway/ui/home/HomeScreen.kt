@@ -33,9 +33,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import app.foreway.R
 import app.foreway.data.CareerSummary
 import app.foreway.domain.model.SchoolClass
+import app.foreway.ui.components.CareerCard
 import app.foreway.ui.components.CriterionRow
 import app.foreway.ui.components.Gutter
 import app.foreway.ui.components.PrimaryCta
+import app.foreway.ui.components.BackAction
+import app.foreway.ui.components.SecondaryAction
+import app.foreway.ui.components.UnregulatedNote
 import app.foreway.ui.components.TimelineRail
 import app.foreway.ui.format.familyLabel
 import app.foreway.ui.theme.ForewayColors
@@ -46,10 +50,12 @@ import app.foreway.ui.theme.LocalAccent
 @Composable
 fun HomeScreen(
     onOpenPathway: (careerId: String) -> Unit,
+    onOpenCareer: (careerId: String) -> Unit,
+    onBrowse: () -> Unit,
     vm: HomeViewModel = viewModel(factory = HomeViewModel.Factory),
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
-    HomeContent(state, onChooseCareer = vm::chooseGoal, onOpenPathway = onOpenPathway)
+    HomeContent(state, onOpenCareer = onOpenCareer, onBrowse = onBrowse, onOpenPathway = onOpenPathway)
 }
 
 /**
@@ -63,7 +69,8 @@ fun HomeScreen(
 @Composable
 fun HomeContent(
     state: HomeUiState,
-    onChooseCareer: (String) -> Unit,
+    onOpenCareer: (String) -> Unit,
+    onBrowse: () -> Unit = {},
     onOpenPathway: (String) -> Unit = {},
 ) {
     val family = (state as? HomeUiState.Ready)?.career?.family
@@ -85,11 +92,17 @@ fun HomeContent(
                     .verticalScroll(rememberScrollState())
                     .padding(bottom = 24.dp),
             ) {
-                Spacer(Modifier.height(24.dp))
+                if (ready != null) {
+                    // Top left, where every other screen keeps its way out. Home is the root,
+                    // so this opens the career list rather than popping the stack.
+                    BackAction(stringResource(R.string.home_all_careers), onBrowse, Modifier.padding(horizontal = 16.dp))
+                } else {
+                    Spacer(Modifier.height(24.dp))
+                }
                 when (state) {
                     HomeUiState.Loading -> Unit
-                    is HomeUiState.Ready -> Ready(state)
-                    is HomeUiState.NoGoal -> NoGoal(state.careers, onChooseCareer)
+                    is HomeUiState.Ready -> Ready(state, onOpenCareer, onBrowse)
+                    is HomeUiState.NoGoal -> NoGoal(state.careers, onOpenCareer, onBrowse)
                     HomeUiState.NotDownloaded -> Message(
                         stringResource(R.string.home_not_downloaded_title),
                         stringResource(R.string.home_not_downloaded_body),
@@ -110,7 +123,7 @@ fun HomeContent(
 }
 
 @Composable
-private fun Ready(state: HomeUiState.Ready) {
+private fun Ready(state: HomeUiState.Ready, onOpenCareer: (String) -> Unit, onBrowse: () -> Unit) {
     val accent = LocalAccent.current
 
     Text(
@@ -126,6 +139,11 @@ private fun Ready(state: HomeUiState.Ready) {
         color = ForewayColors.Ink,
         modifier = Modifier.padding(horizontal = Gutter),
     )
+
+    if (!state.career.regulated) {
+        Spacer(Modifier.height(8.dp))
+        UnregulatedNote(Modifier.padding(horizontal = Gutter))
+    }
 
     state.rail?.let { rail ->
         Spacer(Modifier.height(24.dp))
@@ -156,35 +174,49 @@ private fun Ready(state: HomeUiState.Ready) {
 
     if (state.assessed.isEmpty()) {
         Text(
-            text = stringResource(R.string.home_no_criteria),
+            // An unregulated career has no gates by nature; a regulated one with none shown
+            // has gates we have not yet verified. The two must never read the same.
+            text = stringResource(if (state.career.regulated) R.string.home_no_criteria else R.string.home_no_gates_unregulated),
             style = ForewayTypography.bodyLarge,
             color = ForewayColors.InkMuted,
             modifier = Modifier.padding(horizontal = Gutter),
         )
-        return
+    } else {
+        Text(
+            text = stringResource(R.string.home_live_body),
+            style = ForewayTypography.bodyLarge,
+            color = ForewayColors.InkMuted,
+            modifier = Modifier.padding(horizontal = Gutter),
+        )
+        Spacer(Modifier.height(12.dp))
+        Column(
+            Modifier
+                .padding(horizontal = Gutter)
+                .fillMaxWidth()
+                .background(ForewayColors.Card, RoundedCornerShape(20.dp))
+                .border(1.dp, ForewayColors.Hairline, RoundedCornerShape(20.dp))
+                .padding(horizontal = 20.dp, vertical = 8.dp),
+        ) {
+            state.assessed.forEach { CriterionRow(it) }
+        }
     }
 
-    Text(
-        text = stringResource(R.string.home_live_body),
-        style = ForewayTypography.bodyLarge,
-        color = ForewayColors.InkMuted,
-        modifier = Modifier.padding(horizontal = Gutter),
-    )
-    Spacer(Modifier.height(12.dp))
-    Column(
-        Modifier
-            .padding(horizontal = Gutter)
-            .fillMaxWidth()
-            .background(ForewayColors.Card, RoundedCornerShape(20.dp))
-            .border(1.dp, ForewayColors.Hairline, RoundedCornerShape(20.dp))
-            .padding(horizontal = 20.dp, vertical = 8.dp),
-    ) {
-        state.assessed.forEach { CriterionRow(it) }
+    if (state.specialisations.isNotEmpty()) {
+        Spacer(Modifier.height(28.dp))
+        Column(Modifier.padding(horizontal = Gutter)) {
+            Text(stringResource(R.string.home_go_further), style = ForewayTypography.titleLarge, color = ForewayColors.Ink)
+            Spacer(Modifier.height(4.dp))
+            Text(stringResource(R.string.home_go_further_body), style = ForewayTypography.bodyLarge, color = ForewayColors.InkMuted)
+            state.specialisations.forEach { c ->
+                Spacer(Modifier.height(8.dp))
+                CareerCard(c, specialisations = 0, onOpen = { onOpenCareer(c.id) })
+            }
+        }
     }
 }
 
 @Composable
-private fun NoGoal(careers: List<CareerSummary>, onChoose: (String) -> Unit) {
+private fun NoGoal(careers: List<CareerSummary>, onOpenCareer: (String) -> Unit, onBrowse: () -> Unit) {
     Text(
         text = stringResource(R.string.home_no_goal_title),
         style = ForewayTypography.headlineLarge,
@@ -203,29 +235,14 @@ private fun NoGoal(careers: List<CareerSummary>, onChoose: (String) -> Unit) {
         return
     }
 
-    careers.forEach { career ->
-        Row(
-            Modifier
-                .padding(horizontal = Gutter, vertical = 4.dp)
-                .fillMaxWidth()
-                .heightIn(min = 64.dp)
-                .background(ForewayColors.Card, RoundedCornerShape(16.dp))
-                .border(1.dp, ForewayColors.Hairline, RoundedCornerShape(16.dp))
-                .clickable(role = Role.Button) { onChoose(career.id) }
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text(
-                    text = stringResource(familyLabel(career.family)).uppercase(),
-                    style = ForewayTypography.labelMedium,
-                    color = ForewayColors.InkMuted,
-                )
-                Text(career.title, style = ForewayTypography.labelLarge, color = ForewayColors.Ink)
-            }
-            Text("›", style = ForewayTypography.titleLarge, color = ForewayColors.InkFaint)
+    Column(Modifier.padding(horizontal = Gutter)) {
+        careers.forEach { career ->
+            CareerCard(career, specialisations = 0, onOpen = { onOpenCareer(career.id) }, showFamily = true)
+            Spacer(Modifier.height(8.dp))
         }
     }
+    Spacer(Modifier.height(8.dp))
+    SecondaryAction(stringResource(R.string.browse_all), onBrowse, Modifier.padding(horizontal = Gutter))
 }
 
 @Composable
@@ -255,18 +272,18 @@ private fun railLabel(stop: RailStop): String = stringResource(
 @Preview(name = "Home", showBackground = true, widthDp = 360, heightDp = 780)
 @Composable
 private fun HomePreview() {
-    HomeContent(HomeFixture.ready, onChooseCareer = {})
+    HomeContent(HomeFixture.ready, onOpenCareer = {})
 }
 
 /** The layout must survive a user running large text. DESIGN.md asks for 200%. */
 @Preview(name = "Home at 200% font", showBackground = true, widthDp = 360, heightDp = 780, fontScale = 2.0f)
 @Composable
 private fun HomeLargeTextPreview() {
-    HomeContent(HomeFixture.ready, onChooseCareer = {})
+    HomeContent(HomeFixture.ready, onOpenCareer = {})
 }
 
 @Preview(name = "No goal", showBackground = true, widthDp = 360, heightDp = 780)
 @Composable
 private fun NoGoalPreview() {
-    HomeContent(HomeUiState.NoGoal(listOf(HomeFixture.ready.career)), onChooseCareer = {})
+    HomeContent(HomeUiState.NoGoal(listOf(HomeFixture.ready.career)), onOpenCareer = {})
 }

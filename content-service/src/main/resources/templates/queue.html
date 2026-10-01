@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments :: head('Queue')}"></head>
+<body>
+<header th:replace="~{fragments :: header}"></header>
+<main>
+    <h1>Review queue</h1>
+    <p class="muted">
+        Open each record, open its source document, and check the value against it before signing.
+        A signed record reaches students' phones on their next sync.
+    </p>
+
+    <section th:each="career : ${careers}" class="card">
+        <h2 th:text="${career.title}">Career</h2>
+
+        <h3>Needs your review <span class="count" th:text="${career.needsReview.size()}">0</span></h3>
+        <p th:if="${career.needsReview.isEmpty()}" class="muted">Nothing waiting.</p>
+        <ul class="rows">
+            <li th:each="item : ${career.needsReview}">
+                <a th:href="@{/review/{k}/{id}(k=${item.kind}, id=${item.id})}" th:text="${item.label}">label</a>
+                <span class="tag" th:text="${item.kind}">kind</span>
+            </li>
+        </ul>
+
+        <h3>Blocked or returned <span class="count" th:text="${career.blocked.size()}">0</span></h3>
+        <ul class="rows">
+            <li th:each="item : ${career.blocked}">
+                <a th:href="@{/review/{k}/{id}(k=${item.kind}, id=${item.id})}" th:text="${item.label}">label</a>
+                <span class="tag" th:text="${item.kind}">kind</span>
+                <div th:if="${item.note}" class="note" th:text="${item.note}">note</div>
+            </li>
+        </ul>
+
+        <h3>On students' phones <span class="count" th:text="${career.published.size()}">0</span></h3>
+        <ul class="rows">
+            <li th:each="item : ${career.published}">
+                <a th:href="@{/review/{k}/{id}(k=${item.kind}, id=${item.id})}" th:text="${item.label}">label</a>
+                <span class="tag" th:text="${item.kind}">kind</span>
+                <span th:if="${item.signedBy}" class="muted" th:text="|signed by ${item.signedBy}|">signed</span>
+            </li>
+        </ul>
+    </section>
+</main>
+</body>
+</html>
