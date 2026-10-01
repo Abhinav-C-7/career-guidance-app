@@ -86,14 +86,15 @@ Android-only, native. No iOS, no cross-platform layer.
 | State | ViewModel + StateFlow, unidirectional | One immutable UI state per screen, exposed as a single flow |
 | DI | Hilt | |
 | Local store | **Room** | Source of truth on device. The app is local-first: a pathway must open with no network |
-| Backend | **Supabase** (Postgres, Storage, RLS) via `supabase-kt` | Content store. The domain is deeply relational — careers, exams, criteria, pathways |
+| Backend (serving) | **Supabase** (Postgres, Storage, RLS), read over plain HTTPS from `:data` | Content store. The domain is deeply relational — careers, exams, criteria, pathways. The app reads only `published_careers`, `published_criteria` and `criteria_withdrawals`, never base tables |
+| Backend (content service) | **Spring Boot (Kotlin) on Railway** | Fetches official sources on schedule, detects changes, extracts candidates with AI, runs the human review queue, publishes approved records. See "Two backends" below |
 | Serialization | kotlinx.serialization | |
 | Deadlines | WorkManager, inexact | Deadline reminders do not need minute precision; inexact work is far kinder to battery. Notifications are scheduled on-device from synced data — no push infrastructure in v1 |
 | Auth | **None in v1** | Local-first. Ask for a phone number only when the student wants a reminder, never at first run |
 | AI | **Not in the MVP.** Behind one interface (`:ai`) when it lands, provider swapped by config — Gemini free tier while building | The pathway is deterministic. The model only ever explains what retrieval already returned |
 | Analytics | PostHog (EU or India region) | Student data minimisation |
 | Payments (later) | Razorpay | UPI-first |
-| Content authoring | Structured records in the repo (YAML/JSON) reviewed in PRs, published to Supabase | Content must be diffable and reviewable |
+| Content authoring | Today: JSON in `content/careers/`, published by `tools/publish`. Later: the content service's review screen | Content must be diffable and reviewable, and signed by a person |
 
 Target device is a low-end Android phone on a slow connection. Keep the APK small, budget
 for cold starts, test on a throttled network at 360dp.
@@ -106,7 +107,30 @@ milestone ordering, and copy for criteria all live in the content store and sync
 rule encoded as a Kotlin `when` branch is a rule that needs a release to fix — and given
 principle 4, a wrong rule is the one thing we cannot afford to be slow about.
 
+### Two backends, two jobs
+
+```
+Official sites → content service (Spring Boot, Railway) → human approves → Supabase → app
+                 fetch, diff, extract, review queue                        serves     syncs, works offline
+```
+
+- **Serving** is Supabase. The phone reads published views directly. No custom server sits
+  in the student read path: if Railway is down, students notice nothing.
+- **Gathering** is the content service. It checks sources daily (exam notifications) and on
+  each record's verification window (rules), re-extracts only when a document's hash changes,
+  and queues candidates for review. It **never publishes on its own** — the database refuses
+  a VERIFIED row signed by automation (`verified_requires_a_human`).
+- The schema is owned by `supabase/migrations` and the Supabase CLI. The content service
+  must not run Flyway/Liquibase or `ddl-auto` against it.
+- The secret key lives only in Railway's environment and a local, gitignored `.env`. Never in
+  the app, never in the repo. The app ships only the publishable (anon) key; RLS is the
+  boundary.
+
 ## Conventions
+
+- No `supabase-kt` on the client. The app makes three read-only PostgREST queries; the SDK
+  would add Ktor, `auth-kt` and `kotlin-reflect` to the APK and pin our Kotlin version to
+  its own. Revisit only if the app ever needs auth or realtime.
 
 - Kotlin, explicit API mode on library modules. No platform types leaking into domain.
 - Domain model (`Career`, `Exam`, `Criterion`, `Pathway`, `Milestone`, `Deadline`) lives in

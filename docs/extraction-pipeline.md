@@ -115,9 +115,32 @@ cannot yet give you the figure", and by construction it carries no requirement v
 admitting it leaks no unreviewed number. `DRAFT` and `NEEDS_REVIEW` never leave the server.
 
 Three independent gates enforce this, because any one of them is a single point of failure:
-the publish script, `GateEvaluator.assess`, and the row-level security policy in
-`supabase/migrations/0002_rls.sql`. The last is the strongest — the rows never cross the
-wire — and `supabase/tests/rls_test.sql` proves it holds.
+
+1. **The publish tool** (`tools/publish`) parses content with the app's own `ContentLoader`,
+   refuses any `VERIFIED` value signed `automated-extraction-unreviewed`, and prints exactly
+   which criteria students will start and stop seeing. Dry run by default.
+2. **`GateEvaluator.assess`** drops anything unpublished even if it reaches the device.
+3. **Row-level security** (`supabase/migrations/20260920000002_rls.sql`). The strongest — the
+   rows never cross the wire — and `supabase/tests/rls_test.sql` proves it holds.
+
+The tool writes **every** review state, not only published ones. A criterion demoted in the
+repo must be demoted on the server too, or phones keep the retracted figure; unreviewed rows
+on the server are invisible to clients. Unchanged rows are skipped, because every write bumps
+`updated_at` and forces every phone to re-sync.
+
+```bash
+./gradlew :tools:publish:run                                 # dry run
+./gradlew :tools:publish:run --args="--apply"                # write
+./gradlew :tools:publish:run --args="--apply --allow-delete" # also delete removed criteria
+```
+
+### What the app reads
+
+The client contract is `published_careers`, `published_criteria` and `criteria_withdrawals`
+(`supabase/migrations/20260925000001_published_views.sql`) — never the base tables. Sync is:
+pull rows with `updated_at` after the last sync, then drop every id in `criteria_withdrawals`
+withdrawn after it. Without withdrawals, a demoted or deleted criterion would simply stop
+arriving, and a phone would go on showing it offline indefinitely.
 
 ## Change detection
 

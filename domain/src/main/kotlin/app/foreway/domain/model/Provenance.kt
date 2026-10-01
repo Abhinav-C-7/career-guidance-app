@@ -31,6 +31,22 @@ public data class Provenance(
      */
     public fun isStale(asOf: LocalDate, window: VerificationWindow): Boolean =
         lastVerifiedAt.daysUntil(asOf) > window.days
+
+    public companion object {
+        /**
+         * What the extraction pass writes into [verifiedBy]. It is a signature that means
+         * "nobody has signed". The database refuses VERIFIED with this value (constraint
+         * verified_requires_a_human), and so does the publish tool.
+         */
+        public const val UNREVIEWED: String = "automated-extraction-unreviewed"
+
+        /**
+         * What a synced record carries in [verifiedBy]. The server withholds the reviewer's
+         * name from clients (DESIGN.md shows the source and date, not the person). That a
+         * person signed is still guaranteed: the database refuses VERIFIED with [UNREVIEWED].
+         */
+        public const val WITHHELD: String = "signed-server-side"
+    }
 }
 
 /**

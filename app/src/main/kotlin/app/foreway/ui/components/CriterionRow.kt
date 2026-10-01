@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import app.foreway.R
 import app.foreway.domain.model.AssessedCriterion
 import app.foreway.domain.model.GateOutcome
+import app.foreway.domain.model.LookupPointer
 import app.foreway.ui.format.describe
 import app.foreway.ui.format.displayValue
 import app.foreway.ui.format.monthAndYear
@@ -107,7 +108,9 @@ private fun SourceChip(assessed: AssessedCriterion) {
     when {
         assessed.sourceGap -> {
             val pointer = assessed.criterion.lookUpAt
-            text = if (pointer != null) {
+            text = if (pointer?.describedAs == LookupPointer.UNREADABLE_BY_THIS_VERSION) {
+                stringResource(R.string.chip_update_app)
+            } else if (pointer != null) {
                 stringResource(R.string.chip_no_figure_with_pointer, pointer.describedAs.take(48))
             } else {
                 stringResource(R.string.chip_no_figure)

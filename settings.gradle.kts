@@ -24,3 +24,5 @@ rootProject.name = "foreway"
 
 include(":domain")
 include(":app")
+include(":data")
+include(":tools:publish")

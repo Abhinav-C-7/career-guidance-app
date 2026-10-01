@@ -226,7 +226,17 @@ public data class LookupPointer(
     val describedAs: String,
     val url: String? = null,
     val citedBy: String,
-)
+) {
+    public companion object {
+        /**
+         * [describedAs] for a record this build of the app cannot read — a requirement kind
+         * or applicability dimension added after it shipped. The criterion is shown as a
+         * gap pointing at its source, never dropped: hiding a gate because the app is old
+         * would break principle 4. The UI renders this as "update the app".
+         */
+        public const val UNREADABLE_BY_THIS_VERSION: String = "unreadable-by-this-version"
+    }
+}
 
 /**
  * One requirement, sourced, scoped, and given a stability class for re-verification.

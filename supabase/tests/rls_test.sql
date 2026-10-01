@@ -132,4 +132,62 @@ exception
         null; -- expected: verified_requires_a_human
 end $$;
 
+-- --------------------------------------------------------------------------
+-- The client contract: the views show exactly what RLS allows, and a demotion
+-- leaves a tombstone the phone can sync.
+-- --------------------------------------------------------------------------
+
+set local role anon;
+
+do $$
+declare
+    visible text[];
+begin
+    select array_agg(id order by id) into visible
+    from published_criteria where career_id = 'rls-test';
+
+    if visible is distinct from array['rls-gap', 'rls-verified'] then
+        raise exception 'published_criteria should match RLS, saw: %',
+            coalesce(visible::text, 'nothing');
+    end if;
+end $$;
+
+reset role;
+
+-- A reviewer pulls a figure back because the source changed.
+update criteria set review = 'NEEDS_REVIEW' where id = 'rls-verified';
+
+set local role anon;
+
+do $$
+begin
+    if exists (select 1 from published_criteria where id = 'rls-verified') then
+        raise exception 'a demoted criterion is still published';
+    end if;
+    if not exists (select 1 from criteria_withdrawals where criterion_id = 'rls-verified') then
+        raise exception 'demotion left no withdrawal; phones would keep the retracted figure';
+    end if;
+end $$;
+
+reset role;
+
+-- Re-verified: the tombstone must go, or it would outrank the fresh row on next sync.
+update criteria set review = 'VERIFIED' where id = 'rls-verified';
+
+do $$
+begin
+    if exists (select 1 from criteria_withdrawals where criterion_id = 'rls-verified') then
+        raise exception 'republished criterion still has a withdrawal';
+    end if;
+end $$;
+
+delete from criteria where id = 'rls-gap';
+
+do $$
+begin
+    if not exists (select 1 from criteria_withdrawals where criterion_id = 'rls-gap') then
+        raise exception 'deleting a published criterion left no withdrawal';
+    end if;
+end $$;
+
 rollback;

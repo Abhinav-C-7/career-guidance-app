@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Content sync only. Nothing about the student is ever sent. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
+        android:name=".ForewayApp"
         android:allowBackup="true"
         android:label="Foreway"
         android:supportsRtl="true"

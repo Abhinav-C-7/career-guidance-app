@@ -62,5 +62,6 @@
     <string name="chip_needs_recheck">%1$s · needs re-check</string>
     <string name="chip_verified">%1$s · verified %2$s</string>
     <string name="chip_no_figure">No verified figure yet</string>
+    <string name="chip_update_app">This rule needs a newer version of the app · update to see it</string>
     <string name="chip_no_figure_with_pointer">No verified figure yet · see %1$s</string>
 </resources>
