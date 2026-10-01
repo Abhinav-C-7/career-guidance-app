@@ -64,4 +64,111 @@
     <string name="chip_no_figure">No verified figure yet</string>
     <string name="chip_update_app">This rule needs a newer version of the app · update to see it</string>
     <string name="chip_no_figure_with_pointer">No verified figure yet · see %1$s</string>
+
+    <!-- Onboarding. One question per screen (DESIGN.md). Every "why" line exists because a
+         student deserves to know what an answer is used for before giving it. -->
+    <string name="onb_welcome_title">Every gate between you and your goal, before it is too late</string>
+    <string name="onb_welcome_body">Tell us where you are today and what you want to become. We show the exams, age limits, physical standards and deadlines on the way, each with the official source it came from.</string>
+    <string name="onb_welcome_privacy">Your answers stay on this phone.</string>
+    <string name="onb_start">Start</string>
+    <string name="onb_continue">Continue</string>
+    <string name="onb_finish">Show my pathway</string>
+    <string name="onb_back">Back</string>
+    <string name="onb_step">%1$d of %2$d</string>
+
+    <string name="onb_class_title">Which class are you in?</string>
+    <string name="onb_class_why">Some choices lock earlier than students expect. Knowing where you are tells us which ones are still open.</string>
+    <string name="class_8">Class 8</string>
+    <string name="class_9">Class 9</string>
+    <string name="class_10">Class 10</string>
+    <string name="class_11">Class 11</string>
+    <string name="class_12">Class 12</string>
+    <string name="class_passed_12">Finished class 12</string>
+
+    <string name="onb_board_title">Which board is your school under?</string>
+    <string name="onb_board_why">Subject rules differ between boards, and some exams treat them differently.</string>
+    <string name="board_cbse">CBSE</string>
+    <string name="board_cisce">CISCE (ICSE / ISC)</string>
+    <string name="board_state">State board</string>
+    <string name="board_nios">NIOS</string>
+    <string name="board_international">IB or Cambridge</string>
+    <string name="board_other">Something else</string>
+    <string name="onb_board_skip">Not sure</string>
+
+    <string name="onb_state_title">Which state do you study in?</string>
+    <string name="onb_state_why">State quotas and domicile rules depend on it.</string>
+    <string name="onb_state_skip">Skip for now</string>
+
+    <string name="onb_dob_title">When were you born?</string>
+    <string name="onb_dob_why">Age limits are the gate students most often discover too late. We use your date of birth only to check them, on this phone.</string>
+    <string name="onb_dob_day">Day</string>
+    <string name="onb_dob_month">Month</string>
+    <string name="onb_dob_year">Year</string>
+    <string name="onb_dob_skip">I would rather not say</string>
+    <string name="onb_dob_not_a_date">That date does not exist. Check the day and month.</string>
+    <string name="onb_dob_future">That date is in the future.</string>
+    <string name="onb_dob_implausible">Check the year. It looks like a typo.</string>
+
+    <string name="onb_goal_title">What do you want to become?</string>
+    <string name="onb_goal_why">Pick the one you are most serious about. One is enough to start.</string>
+    <string name="onb_goal_skip">I will browse first</string>
+    <string name="onb_goal_empty">Careers download the first time you are online. You can pick one from home after that.</string>
+
+    <!-- Career families, as eyebrow labels -->
+    <string name="family_defence">Defence and uniformed services</string>
+    <string name="family_medical">Medicine and health</string>
+    <string name="family_engineering">Engineering and technology</string>
+    <string name="family_commerce">Commerce and finance</string>
+    <string name="family_civic">Law and civil services</string>
+    <string name="family_design">Design and architecture</string>
+    <string name="family_maritime">Maritime and aviation</string>
+    <string name="family_unknown">Career</string>
+
+    <!-- Home -->
+    <string name="home_live_title">Live right now</string>
+    <string name="home_live_body">What stands between you and this career, and where each one sits today.</string>
+    <string name="home_no_goal_title">Pick a career to see its gates</string>
+    <string name="home_no_goal_empty">Careers download the first time you are online. Connect once and they will appear here.</string>
+    <string name="home_not_downloaded_title">Not downloaded yet</string>
+    <string name="home_not_downloaded_body">This career has not reached your phone yet. Connect to the internet once and it will appear.</string>
+    <string name="home_no_criteria">We have no verified requirements for this career yet. We would rather show nothing than guess.</string>
+    <string name="home_rail_after_school">After 12</string>
+
+    <!-- States and union territories, ISO 3166-2:IN -->
+    <string name="state_an">Andaman and Nicobar Islands</string>
+    <string name="state_ap">Andhra Pradesh</string>
+    <string name="state_ar">Arunachal Pradesh</string>
+    <string name="state_as">Assam</string>
+    <string name="state_br">Bihar</string>
+    <string name="state_ch">Chandigarh</string>
+    <string name="state_cg">Chhattisgarh</string>
+    <string name="state_dh">Dadra and Nagar Haveli and Daman and Diu</string>
+    <string name="state_dl">Delhi</string>
+    <string name="state_ga">Goa</string>
+    <string name="state_gj">Gujarat</string>
+    <string name="state_hr">Haryana</string>
+    <string name="state_hp">Himachal Pradesh</string>
+    <string name="state_jk">Jammu and Kashmir</string>
+    <string name="state_jh">Jharkhand</string>
+    <string name="state_ka">Karnataka</string>
+    <string name="state_kl">Kerala</string>
+    <string name="state_la">Ladakh</string>
+    <string name="state_ld">Lakshadweep</string>
+    <string name="state_mp">Madhya Pradesh</string>
+    <string name="state_mh">Maharashtra</string>
+    <string name="state_mn">Manipur</string>
+    <string name="state_ml">Meghalaya</string>
+    <string name="state_mz">Mizoram</string>
+    <string name="state_nl">Nagaland</string>
+    <string name="state_od">Odisha</string>
+    <string name="state_py">Puducherry</string>
+    <string name="state_pb">Punjab</string>
+    <string name="state_rj">Rajasthan</string>
+    <string name="state_sk">Sikkim</string>
+    <string name="state_tn">Tamil Nadu</string>
+    <string name="state_ts">Telangana</string>
+    <string name="state_tr">Tripura</string>
+    <string name="state_up">Uttar Pradesh</string>
+    <string name="state_uk">Uttarakhand</string>
+    <string name="state_wb">West Bengal</string>
 </resources>

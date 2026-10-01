@@ -1,7 +1,7 @@
 package app.foreway.ui.home
 
+import app.foreway.data.CareerSummary
 import app.foreway.domain.engine.GateEvaluator
-import app.foreway.domain.model.AssessedCriterion
 import app.foreway.domain.model.BodyMetricKind
 import app.foreway.domain.model.CareerFamily
 import app.foreway.domain.model.ColourVisionGrade
@@ -19,14 +19,12 @@ import app.foreway.domain.model.VerificationWindow
 import kotlinx.datetime.LocalDate
 
 /**
- * Development fixture. NOT the real NDA content.
+ * PREVIEWS ONLY. NOT the real NDA content, and never shown on a device.
  *
- * The records in `content/careers/nda-officer-entry.json` are still unreviewed, and by
- * design nothing unreviewed reaches a screen. So this file stands in until the real
- * content is signed off and syncing — it exists to exercise the layout, and it is
- * deliberately marked VERIFIED here and nowhere else.
- *
- * Delete this the day real content flows from Supabase.
+ * The running app renders home from the local store (HomeViewModel). This exists so the
+ * layout can be checked in Android Studio previews with every gate state on screen at
+ * once — something real content, all still unreviewed, cannot do yet. It is deliberately
+ * marked VERIFIED here and nowhere else.
  *
  * The values are shaped to produce all four gate states plus a source gap, so the design
  * gets exercised rather than flattered.
@@ -109,11 +107,9 @@ object HomeFixture {
         ),
     )
 
-    val assessed: List<AssessedCriterion> = GateEvaluator().assess(criteria, profile, today)
-
-    val careerTitle = "Armed forces officer"
-    val familyLabel = "Defence and uniformed services"
-    val family = CareerFamily.DEFENCE
-    val stages = listOf("Class 9", "Class 10", "Class 11", "NDA")
-    val currentStageIndex = 1
+    val ready = HomeUiState.Ready(
+        career = CareerSummary("nda-officer-entry", "Armed forces officer", CareerFamily.DEFENCE),
+        rail = railFor(SchoolClass.CLASS_10),
+        assessed = HomeViewModel.ordered(GateEvaluator().assess(criteria, profile, today)),
+    )
 }
