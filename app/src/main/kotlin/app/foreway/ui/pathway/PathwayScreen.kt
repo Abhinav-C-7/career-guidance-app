@@ -7,17 +7,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,13 +36,30 @@ import app.foreway.domain.engine.Position
 import app.foreway.domain.model.AssessedCriterion
 import app.foreway.domain.model.Necessity
 import app.foreway.domain.model.SchoolClass
-import app.foreway.domain.model.Timing
+import app.foreway.ui.art.FieldMosaic
+import app.foreway.ui.art.HeroCard
+import app.foreway.ui.art.HeroEyebrow
+import app.foreway.ui.art.HeroText
+import app.foreway.ui.art.HeroTitle
+import app.foreway.ui.art.IconBadge
+import app.foreway.ui.art.LineageStrip
+import app.foreway.ui.art.careerIcon
 import app.foreway.ui.components.CriterionRow
+import app.foreway.ui.components.Reveal
 import app.foreway.ui.components.Gutter
 import app.foreway.ui.components.SourceLine
-import app.foreway.ui.components.BackAction
+import app.foreway.ui.components.EmptyCard
 import app.foreway.ui.components.UnregulatedNote
+import app.foreway.ui.format.chainLabel
+import app.foreway.ui.format.classLabel
 import app.foreway.ui.format.familyLabel
+import app.foreway.ui.format.timingLabel
+import app.foreway.ui.goal.Goal
+import app.foreway.ui.goal.GoalFixture
+import app.foreway.ui.goal.GoalViewModel
+import app.foreway.ui.shell.ForewayTopBar
+import app.foreway.ui.shell.Tab
+import app.foreway.ui.shell.TabScaffold
 import app.foreway.ui.theme.ForewayColors
 import app.foreway.ui.theme.ForewayTheme
 import app.foreway.ui.theme.ForewayTypography
@@ -55,11 +67,11 @@ import app.foreway.ui.theme.LocalAccent
 
 @Composable
 fun PathwayScreen(
-    onBack: () -> Unit,
-    vm: PathwayViewModel = viewModel(factory = PathwayViewModel.Factory),
+    onSelectTab: (Tab) -> Unit,
+    vm: GoalViewModel = viewModel(factory = GoalViewModel.Factory),
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
-    PathwayContent(state, onBack)
+    PathwayContent(state, onSelectTab)
 }
 
 /**
@@ -71,56 +83,73 @@ fun PathwayScreen(
  * done, so the screen only ever says where they are in time.
  */
 @Composable
-fun PathwayContent(state: PathwayUiState, onBack: () -> Unit) {
-    val family = (state as? PathwayUiState.Ready)?.career?.family
+fun PathwayContent(state: Goal, onSelectTab: (Tab) -> Unit) {
+    val family = (state as? Goal.Ready)?.career?.family
+    val scroll = rememberScrollState()
     ForewayTheme(family = family) {
-        Column(
-            Modifier
-                .fillMaxSize()
-                .background(ForewayColors.Canvas)
-                .windowInsetsPadding(WindowInsets.statusBars)
-                .verticalScroll(rememberScrollState())
-                .windowInsetsPadding(WindowInsets.navigationBars)
-                .padding(bottom = 32.dp),
+        TabScaffold(
+            topBar = { ForewayTopBar(stringResource(R.string.tab_pathway), scrolled = scroll.value > 0) },
         ) {
-            BackAction(stringResource(R.string.pathway_back), onBack, Modifier.padding(horizontal = 16.dp))
-            when (state) {
-                PathwayUiState.Loading -> Unit
-                PathwayUiState.NotDownloaded -> Padded {
-                    Text(stringResource(R.string.home_not_downloaded_title), style = ForewayTypography.headlineLarge, color = ForewayColors.Ink)
-                    Spacer(Modifier.height(12.dp))
-                    Text(stringResource(R.string.home_not_downloaded_body), style = ForewayTypography.bodyLarge, color = ForewayColors.InkMuted)
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(scroll)
+                    .padding(top = 8.dp, bottom = 32.dp),
+            ) {
+                when (state) {
+                    Goal.Loading -> Unit
+                    is Goal.None -> Reveal(0) {
+                        EmptyCard(
+                            title = stringResource(R.string.pathway_no_goal_title),
+                            body = stringResource(R.string.pathway_no_goal_body),
+                            action = stringResource(R.string.today_explore),
+                            onAction = { onSelectTab(Tab.EXPLORE) },
+                            art = { FieldMosaic() },
+                        )
+                    }
+                    Goal.NotDownloaded -> EmptyCard(
+                        title = stringResource(R.string.home_not_downloaded_title),
+                        body = stringResource(R.string.home_not_downloaded_body),
+                        action = null,
+                        onAction = {},
+                    )
+                    is Goal.Ready -> Ready(state)
                 }
-                is PathwayUiState.Ready -> Ready(state)
             }
         }
     }
 }
 
 @Composable
-private fun Ready(state: PathwayUiState.Ready) {
-    val accent = LocalAccent.current
+private fun Ready(state: Goal.Ready) {
     val steps = state.pathway.steps
+    val studentClass = state.profile.currentClass
 
-    Padded {
-        Spacer(Modifier.height(8.dp))
-        Text(
-            text = stringResource(familyLabel(state.career.family)).uppercase(),
-            style = ForewayTypography.labelMedium,
-            color = accent,
-        )
-        Spacer(Modifier.height(4.dp))
-        Text(state.career.title, style = ForewayTypography.headlineLarge, color = ForewayColors.Ink)
-        Spacer(Modifier.height(8.dp))
-        Text(stringResource(R.string.pathway_intro), style = ForewayTypography.bodyLarge, color = ForewayColors.InkMuted)
-        if (state.buildsOn.isNotEmpty()) {
-            Spacer(Modifier.height(8.dp))
-            Text(
-                stringResource(R.string.pathway_builds_on, state.buildsOn.joinToString(" → ") { it.title }),
-                style = ForewayTypography.labelSmall,
-                color = ForewayColors.InkMuted,
-            )
+    Reveal(0) {
+        HeroCard(family = state.career.family, seed = state.career.id) {
+            Row(verticalAlignment = Alignment.Top) {
+                Column(Modifier.weight(1f)) {
+                    HeroEyebrow(stringResource(familyLabel(state.career.family)))
+                    Spacer(Modifier.height(4.dp))
+                    HeroTitle(state.career.title)
+                }
+                Spacer(Modifier.width(12.dp))
+                IconBadge(careerIcon(state.career), size = 48.dp)
+            }
+            if (state.buildsOn.isNotEmpty()) {
+                Spacer(Modifier.height(16.dp))
+                LineageStrip(state.buildsOn + state.career)
+                Spacer(Modifier.height(10.dp))
+                HeroText(
+                    stringResource(R.string.pathway_builds_on, chainLabel(state.buildsOn)),
+                    small = true,
+                )
+            }
         }
+    }
+    Padded {
+        Spacer(Modifier.height(16.dp))
+        Text(stringResource(R.string.pathway_intro), style = ForewayTypography.bodyLarge, color = ForewayColors.InkMuted)
         if (!state.career.regulated) {
             Spacer(Modifier.height(16.dp))
             UnregulatedNote()
@@ -142,7 +171,7 @@ private fun Ready(state: PathwayUiState.Ready) {
     // "You are here" sits before the first step still ahead — but only when no step is
     // under way, since a NOW step already marks the student's place, and only when we
     // know their class at all.
-    val hereIndex = if (state.studentClass != null && steps.none { it.position == Position.NOW }) {
+    val hereIndex = if (studentClass != null && steps.none { it.position == Position.NOW }) {
         steps.indexOfFirst { it.position == Position.AHEAD }.takeIf { it >= 0 }
     } else {
         null
@@ -150,10 +179,14 @@ private fun Ready(state: PathwayUiState.Ready) {
 
     Column(Modifier.padding(horizontal = Gutter)) {
         steps.forEachIndexed { i, step ->
-            if (i == hereIndex) {
-                YouAreHere(state.studentClass!!, isFirst = i == 0)
+            Reveal(i + 1) {
+                Column {
+                    if (i == hereIndex) {
+                        YouAreHere(studentClass!!, isFirst = i == 0)
+                    }
+                    StepNode(step, isFirst = i == 0 && hereIndex != 0, isLast = i == steps.lastIndex)
+                }
             }
-            StepNode(step, isFirst = i == 0 && hereIndex != 0, isLast = i == steps.lastIndex)
         }
     }
 
@@ -247,7 +280,7 @@ private fun YouAreHere(current: SchoolClass, isFirst: Boolean) {
         )
         Spacer(Modifier.width(14.dp))
         Text(
-            text = stringResource(R.string.pathway_you_are_here, classLabel(current)).uppercase(),
+            text = stringResource(R.string.pathway_you_are_here, stringResource(classLabel(current))).uppercase(),
             style = ForewayTypography.labelMedium,
             color = accent,
             modifier = Modifier.padding(top = 1.dp, bottom = 28.dp),
@@ -321,49 +354,20 @@ private fun Padded(content: @Composable () -> Unit) {
     Column(Modifier.padding(horizontal = Gutter)) { content() }
 }
 
-@Composable
-private fun timingLabel(t: Timing): String = when (t) {
-    is Timing.SchoolYears -> when {
-        t.from == SchoolClass.PASSED_12 -> stringResource(R.string.timing_after_school)
-        t.from == t.to -> stringResource(R.string.timing_one_year, t.from.number)
-        t.to == SchoolClass.PASSED_12 -> stringResource(R.string.timing_from_stage, t.from.number)
-        else -> stringResource(R.string.timing_school_years, t.from.number, t.to.number)
-    }
-    is Timing.FromStage ->
-        if (t.stage == SchoolClass.PASSED_12) {
-            stringResource(R.string.timing_after_school)
-        } else {
-            stringResource(R.string.timing_from_stage, t.stage.number)
-        }
-    Timing.Follows -> stringResource(R.string.timing_follows)
-}
-
-@Composable
-private fun classLabel(c: SchoolClass): String = stringResource(
-    when (c) {
-        SchoolClass.CLASS_8 -> R.string.class_8
-        SchoolClass.CLASS_9 -> R.string.class_9
-        SchoolClass.CLASS_10 -> R.string.class_10
-        SchoolClass.CLASS_11 -> R.string.class_11
-        SchoolClass.CLASS_12 -> R.string.class_12
-        SchoolClass.PASSED_12 -> R.string.class_passed_12
-    },
-)
-
 @Preview(name = "Pathway, class 10", showBackground = true, widthDp = 360, heightDp = 1600)
 @Composable
 private fun PathwayPreview() {
-    PathwayContent(PathwayFixture.forClass(SchoolClass.CLASS_10), onBack = {})
+    PathwayContent(GoalFixture.ready(SchoolClass.CLASS_10), onSelectTab = {})
 }
 
 @Preview(name = "Pathway, class 12", showBackground = true, widthDp = 360, heightDp = 1600)
 @Composable
 private fun PathwayClass12Preview() {
-    PathwayContent(PathwayFixture.forClass(SchoolClass.CLASS_12), onBack = {})
+    PathwayContent(GoalFixture.ready(SchoolClass.CLASS_12), onSelectTab = {})
 }
 
 @Preview(name = "Pathway at 200% font", showBackground = true, widthDp = 360, heightDp = 2400, fontScale = 2.0f)
 @Composable
 private fun PathwayLargeTextPreview() {
-    PathwayContent(PathwayFixture.forClass(SchoolClass.CLASS_10), onBack = {})
+    PathwayContent(GoalFixture.ready(SchoolClass.CLASS_10), onSelectTab = {})
 }

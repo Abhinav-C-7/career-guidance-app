@@ -1,4 +1,4 @@
-package app.foreway.ui.home
+package app.foreway.ui.today
 
 import app.foreway.domain.model.SchoolClass
 

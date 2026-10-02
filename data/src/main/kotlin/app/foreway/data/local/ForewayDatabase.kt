@@ -117,6 +117,9 @@ internal interface ProfileDao {
 
     @Upsert
     suspend fun save(profile: ProfileEntity)
+
+    @Query("DELETE FROM profile")
+    suspend fun clear()
 }
 
 @Database(

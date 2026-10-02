@@ -14,6 +14,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import app.foreway.ForewayApp
 import java.io.IOException
+import kotlinx.datetime.Clock
 import java.util.concurrent.TimeUnit
 
 /**
@@ -29,6 +30,7 @@ class ContentSyncWorker(context: Context, params: WorkerParameters) : CoroutineW
 
         return try {
             val result = sync.run(full = inputData.getBoolean(KEY_FULL, false))
+            SyncStatus(applicationContext).markChecked(Clock.System.now())
             if (result.unreadable > 0) {
                 Log.w(TAG, "${result.unreadable} criteria need a newer app version to read")
             }
@@ -43,6 +45,19 @@ class ContentSyncWorker(context: Context, params: WorkerParameters) : CoroutineW
     companion object {
         private const val TAG = "ContentSync"
         private const val KEY_FULL = "full"
+
+        /** Unique name of the student-requested check, so the screen can watch it. */
+        const val CHECK_NOW = "content-sync-now"
+
+        /** "Check for updates". Waits for a connection rather than failing without one. */
+        fun checkNow(context: Context) {
+            val online = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                CHECK_NOW,
+                ExistingWorkPolicy.KEEP,
+                OneTimeWorkRequestBuilder<ContentSyncWorker>().setConstraints(online).build(),
+            )
+        }
 
         fun schedule(context: Context) {
             val online = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()

@@ -1,6 +1,5 @@
 package app.foreway.ui.components
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,16 +23,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.StrokeJoin
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import app.foreway.ui.theme.ForewayColors
 import app.foreway.ui.theme.ForewayTypography
 import app.foreway.ui.theme.LocalAccent
+import app.foreway.ui.theme.LocalStrongAccent
 
 val Gutter = 20.dp
 
@@ -51,7 +47,8 @@ fun PrimaryCta(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    accent: Color = LocalAccent.current,
+    // The strong shade: white on the plain accent misses 4.5:1 for several families.
+    accent: Color = LocalStrongAccent.current,
 ) {
     Box(
         modifier
@@ -60,8 +57,8 @@ fun PrimaryCta(
             .padding(horizontal = Gutter)
             .padding(bottom = 24.dp)
             .heightIn(min = 56.dp)
+            .then(if (enabled) Modifier.tappable(shape = RoundedCornerShape(percent = 50), onClick = onClick) else Modifier)
             .background(if (enabled) accent else ForewayColors.Hairline, RoundedCornerShape(percent = 50))
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .padding(horizontal = 24.dp, vertical = 14.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -134,55 +131,24 @@ fun TextAction(label: String, onClick: () -> Unit, modifier: Modifier = Modifier
 }
 
 /**
- * Leaves the screen. Ink, not muted, with a drawn arrow: a way out is load-bearing and must
- * read as tappable at a glance (DESIGN.md, 7:1 for anything load-bearing). The system back
- * gesture does the same thing.
- */
-@Composable
-fun BackAction(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Row(
-        modifier
-            .heightIn(min = 48.dp)
-            .clickable(role = Role.Button, onClick = onClick)
-            .padding(horizontal = 4.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Canvas(Modifier.size(20.dp)) {
-            val stroke = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round)
-            val y = size.height / 2
-            drawPath(
-                Path().apply {
-                    moveTo(size.width * 0.85f, y)
-                    lineTo(size.width * 0.15f, y)
-                    moveTo(size.width * 0.45f, size.height * 0.2f)
-                    lineTo(size.width * 0.15f, y)
-                    lineTo(size.width * 0.45f, size.height * 0.8f)
-                },
-                color = ForewayColors.Ink,
-                style = stroke,
-            )
-        }
-        Spacer(Modifier.width(8.dp))
-        Text(text = label, style = ForewayTypography.labelLarge, color = ForewayColors.Ink)
-    }
-}
-
-/**
- * A real choice that is not the screen's one primary CTA — change career, see all careers.
- * A neutral pill on `surface`: clearly a button, without competing with the accent CTA.
+ * A real choice that is not the screen's one primary CTA — explore careers, check for
+ * updates. A pale pill of the accent with its strong shade for text: clearly a button,
+ * without competing with the filled CTA.
  */
 @Composable
 fun SecondaryAction(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val pill = RoundedCornerShape(percent = 50)
+    val strong = LocalStrongAccent.current
     Row(
         modifier
             .heightIn(min = 48.dp)
-            .background(ForewayColors.Surface, RoundedCornerShape(percent = 50))
-            .clickable(role = Role.Button, onClick = onClick)
+            .tappable(shape = pill, onClick = onClick)
+            .background(LocalAccent.current.copy(alpha = 0.12f), pill)
             .padding(horizontal = 20.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(text = label, style = ForewayTypography.labelLarge, color = ForewayColors.Ink)
+        Text(text = label, style = ForewayTypography.labelLarge, color = strong)
         Spacer(Modifier.width(8.dp))
-        Text(text = "›", style = ForewayTypography.labelLarge, color = ForewayColors.InkMuted)
+        Text(text = "›", style = ForewayTypography.labelLarge, color = strong)
     }
 }

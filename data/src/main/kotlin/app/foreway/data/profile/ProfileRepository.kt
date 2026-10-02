@@ -34,6 +34,11 @@ public class ProfileRepository internal constructor(private val dao: ProfileDao)
         }
     }
 
+    /** "Start over": forget every answer. The app returns to onboarding. */
+    public suspend fun clear() {
+        dao.clear()
+    }
+
     public suspend fun save(saved: SavedProfile) {
         dao.save(
             ProfileEntity(

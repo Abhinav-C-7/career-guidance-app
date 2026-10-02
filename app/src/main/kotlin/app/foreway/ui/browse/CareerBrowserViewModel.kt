@@ -2,18 +2,15 @@ package app.foreway.ui.browse
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import androidx.navigation.toRoute
 import app.foreway.ForewayApp
 import app.foreway.data.CareerSummary
 import app.foreway.data.ContentRepository
 import app.foreway.data.profile.ProfileRepository
 import app.foreway.domain.model.CareerFamily
 import app.foreway.domain.model.Lineage
-import app.foreway.ui.CareerRoute
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -22,11 +19,14 @@ import kotlinx.coroutines.flow.stateIn
 
 data class CareerNode(val career: CareerSummary, val specialisations: Int)
 
+/** A field: its top-level careers, and how many careers it holds at every level. */
+data class FieldGroup(val family: CareerFamily?, val roots: List<CareerNode>, val careers: Int)
+
 sealed interface BrowseUiState {
     data object Loading : BrowseUiState
 
     /** Top-level careers, grouped by family. Empty before the first sync. */
-    data class Fields(val groups: List<Pair<CareerFamily?, List<CareerNode>>>) : BrowseUiState
+    data class Fields(val groups: List<FieldGroup>) : BrowseUiState
 
     data class Career(
         val career: CareerSummary,
@@ -59,7 +59,7 @@ class CareerBrowserViewModel(
                     .groupBy { it.family }
                     .entries
                     .sortedBy { it.key?.ordinal ?: Int.MAX_VALUE }
-                    .map { (family, list) -> family to list.map(::node) },
+                    .map { (family, list) -> FieldGroup(family, list.map(::node), careers.count { it.family == family }) },
             )
         } else {
             val career = careers.firstOrNull { it.id == careerId }
@@ -86,10 +86,11 @@ class CareerBrowserViewModel(
     }
 
     companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
+        /** [careerId] null is the list of fields; otherwise one career. */
+        fun factory(careerId: String?): ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val data = (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ForewayApp).data
-                CareerBrowserViewModel(createSavedStateHandle().toRoute<CareerRoute>().careerId, data.content, data.profile)
+                CareerBrowserViewModel(careerId, data.content, data.profile)
             }
         }
     }

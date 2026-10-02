@@ -2,8 +2,8 @@ package app.foreway.ui
 
 import app.foreway.domain.model.IndianStates
 import app.foreway.domain.model.SchoolClass
-import app.foreway.ui.home.RailStop
-import app.foreway.ui.home.railFor
+import app.foreway.ui.today.RailStop
+import app.foreway.ui.today.railFor
 import app.foreway.ui.onboarding.DateOfBirthInput
 import app.foreway.ui.onboarding.DateOfBirthInput.Result
 import app.foreway.ui.onboarding.IndianStateNames

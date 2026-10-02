@@ -14,6 +14,9 @@ import app.foreway.domain.model.CareerFamily
  */
 val LocalAccent = staticCompositionLocalOf { ForewayColors.CtaDark }
 
+/** The same accent, dark enough to carry white text: hero cards, filled tiles, the CTA. */
+val LocalStrongAccent = staticCompositionLocalOf { ForewayColors.CtaDark }
+
 private val Scheme = lightColorScheme(
     background = ForewayColors.Canvas,
     surface = ForewayColors.Card,
@@ -31,7 +34,7 @@ fun ForewayTheme(
     content: @Composable () -> Unit,
 ) {
     val accent: Color = family?.let { accentFor(it) } ?: ForewayColors.CtaDark
-    CompositionLocalProvider(LocalAccent provides accent) {
+    CompositionLocalProvider(LocalAccent provides accent, LocalStrongAccent provides strongAccentFor(family)) {
         MaterialTheme(
             colorScheme = Scheme.copy(primary = accent),
             typography = ForewayTypography,

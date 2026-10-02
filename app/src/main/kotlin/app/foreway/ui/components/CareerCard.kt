@@ -2,7 +2,6 @@ package app.foreway.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,18 +17,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import app.foreway.R
 import app.foreway.data.CareerSummary
+import app.foreway.ui.art.CareerIconTile
 import app.foreway.ui.format.familyLabel
 import app.foreway.ui.theme.ForewayColors
 import app.foreway.ui.theme.ForewayTypography
 
+private val CareerCardShape = RoundedCornerShape(16.dp)
+
 /**
- * One career in a list: title, its one-line summary, and how many specialisations sit
- * beneath it. Tapping opens the career; it never sets a goal on its own — choosing a goal is
- * a decision, and gets its own screen and CTA (DESIGN.md, one decision per screen).
+ * One career in a list: its icon in its field's colour, title, one-line summary, and how many
+ * specialisations sit beneath it. Tapping opens the career; it never sets a goal on its own —
+ * choosing a goal is a decision, and gets its own screen and CTA (DESIGN.md, one decision
+ * per screen).
  */
 @Composable
 fun CareerCard(
@@ -43,12 +45,14 @@ fun CareerCard(
         modifier
             .fillMaxWidth()
             .heightIn(min = 64.dp)
-            .background(ForewayColors.Card, RoundedCornerShape(16.dp))
-            .border(1.dp, ForewayColors.Hairline, RoundedCornerShape(16.dp))
-            .clickable(role = Role.Button, onClick = onOpen)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .tappable(shape = CareerCardShape, onClick = onOpen)
+            .background(ForewayColors.Card, CareerCardShape)
+            .border(1.dp, ForewayColors.Hairline, CareerCardShape)
+            .padding(horizontal = 14.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        CareerIconTile(career)
+        Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
             if (showFamily) {
                 Text(
@@ -67,7 +71,7 @@ fun CareerCard(
                 Text(
                     pluralStringResource(R.plurals.browse_specialisations, specialisations, specialisations),
                     style = ForewayTypography.labelSmall,
-                    color = ForewayColors.InkFaint,
+                    color = ForewayColors.InkMuted,
                 )
             }
         }
